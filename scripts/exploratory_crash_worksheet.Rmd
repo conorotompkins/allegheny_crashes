@@ -1,0 +1,81 @@
+---
+title: "exploratory_crash_worksheet"
+author: "Conor Tompkins"
+date: "4/21/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(lubridate)
+library(viridis)
+
+theme_set(theme_bw(base_size = 18))
+```
+
+
+
+```{r}
+read_csv("data/all-crashes2004-2016.csv") %>% 
+  clean_names() %>% 
+  mutate(crash_month = month(as.integer(crash_month), label = TRUE),
+         day_of_week = wday(as.integer(day_of_week), label = TRUE),
+         day_of_week = fct_shift(day_of_week, n = 1),
+         time_of_day = as.integer(time_of_day),
+         hour_of_day = as.integer(hour_of_day)) -> df
+```
+```{r}
+preview <- skim(df)
+```
+
+```{r}
+df %>% 
+  distinct(crash_year)
+
+df %>% 
+  count(crash_year) %>% 
+  ggplot(aes(crash_year, n)) +
+    geom_line()
+```
+
+```{r}
+df %>% 
+  distinct(crash_month)
+
+df %>% 
+  count(crash_year, crash_month) %>% 
+  ggplot(aes(crash_year, crash_month, fill = n)) +
+    geom_tile() +
+    coord_equal() +
+    scale_x_continuous(expand = c(0,0)) +
+    scale_y_discrete(expand = c(0,0)) +
+    scale_fill_viridis() +
+    theme(panel.grid = element_blank())
+```
+
+```{r}
+
+df %>% 
+  ggplot(aes(hour_of_day)) +
+  geom_histogram()
+
+df %>% 
+  mutate(day_of_week = fct_rev(day_of_week)) %>% 
+  filter(!hour_of_day > 24,
+         !is.na(day_of_week)) %>% 
+  count(day_of_week, hour_of_day) %>% 
+  ggplot(aes(hour_of_day, day_of_week, fill = n)) +
+  geom_tile() +
+  coord_equal() +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_fill_viridis()
+```
+
