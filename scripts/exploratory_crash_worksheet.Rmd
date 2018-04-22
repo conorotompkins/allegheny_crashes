@@ -16,6 +16,7 @@ library(skimr)
 library(janitor)
 library(lubridate)
 library(viridis)
+library(ggmap)
 
 theme_set(theme_bw(base_size = 18))
 ```
@@ -23,7 +24,7 @@ theme_set(theme_bw(base_size = 18))
 
 
 ```{r}
-read_csv("data/all-crashes2004-2016.csv") %>% 
+read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/all-crashes2004-2016.csv") %>% 
   clean_names() %>% 
   mutate(crash_month = month(as.integer(crash_month), label = TRUE),
          day_of_week = wday(as.integer(day_of_week), label = TRUE),
@@ -79,3 +80,80 @@ df %>%
   scale_fill_viridis()
 ```
 
+```{r}
+df %>% 
+  filter(!time_of_day > 2400,
+         !is.na(day_of_week)) %>% 
+  ggplot(aes(time_of_day, color = day_of_week)) +
+  geom_freqpoly()
+```
+
+```{r}
+colnames(df)
+
+df %>% 
+  select(crash_crn, illumination, weather, road_condition, urban_rural, location_type, rdwy_surf_type_cd, workers_pres, wet_road, snow_slush_road, icy_road, sudden_deer, train, trolley) %>% 
+  gather(key = environmental_factor, value = environmental_measurement, -crash_crn) -> df_environmental_factors
+```
+
+```{r}
+df_environmental_factors %>% 
+  count(environmental_factor, environmental_measurement) %>% 
+  ggplot(aes(x = environmental_measurement, y = n)) +
+  geom_col() +
+  facet_wrap(~environmental_factor,
+             scale = "free")
+```
+
+```{r}
+colnames(df)
+
+df %>% 
+  select(crash_crn, total_units, person_count, vehicle_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, fatal_count, injury_count, maj_inj_count, mod_inj_count, min_inj_count, unk_inj_deg_count, unk_inj_per_count, unbelted_occ_count, unb_death_count, unb_maj_inj_count, belted_death_count, belted_maj_inj_count, mcycle_death_count, mcycle_maj_inj_count, bicycle_death_count, bicycle_maj_inj_count, ped_count, ped_death_count, ped_maj_inj_count, comm_veh_count) %>% 
+  gather(accident_metadata, measurement, -crash_crn) ->  df_accident_metadata
+
+```
+
+```{r}
+df_accident_metadata %>% 
+  #count(accident_metadata, measurement) %>% 
+  ggplot(aes(x = measurement)) +
+  #geom_col() +
+  geom_density() +
+  facet_wrap(~accident_metadata,
+             scale = "free",
+             ncol = 3) +
+  coord_flip()
+```
+
+
+```{r}
+map_pgh <- get_map("Pittsburgh, PA",
+                   zoom = 11,
+                   maptype = "toner",
+                   source = "stamen")
+
+map_pgh <- ggmap(map_pgh)
+```
+
+```{r}
+map_pgh
+```
+
+```{r}
+df %>% 
+  select(dec_lat, dec_long) %>% 
+  filter(!is.na(dec_lat),
+         !is.na(dec_long)) -> df_map
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  theme_void()
+```
