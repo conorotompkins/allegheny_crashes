@@ -1,0 +1,59 @@
+---
+title: "modeling_crash_data"
+author: "Conor Tompkins"
+date: "April 24, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(lubridate)
+library(viridis)
+library(ggmap)
+library(broom)
+
+theme_set(theme_bw(base_size = 18))
+
+options(scipen = 999, digits = 4)
+```
+
+```{r}
+read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/all-crashes2004-2016.csv") %>% 
+  clean_names() %>% 
+  mutate(crash_month = month(as.integer(crash_month), label = TRUE),
+         day_of_week = wday(as.integer(day_of_week), label = TRUE),
+         day_of_week = fct_shift(day_of_week, n = 1),
+         time_of_day = as.integer(time_of_day),
+         hour_of_day = as.integer(hour_of_day),
+         casualties = fatal_count + injury_count,
+         icy_road = as.logical(icy_road),
+         wet_road = as.logical(wet_road),
+         sudden_deer = as.logical(sudden_deer),
+         workers_pres = as.logical(workers_pres),
+         speeding_related = as.logical(speeding_related),
+         rear_end = as.logical(rear_end)) -> df
+```
+
+```{r}
+df -> df_model
+
+df_model %>% 
+  ggplot(aes(casualties)) +
+  geom_freqpoly()
+
+model1 <- lm(casualties ~ ., data = df_model)
+tidy(model1) %>% 
+  filter(term != "(Intercept)") %>% 
+  #arrange(desc(estimate)) %>% 
+  mutate(term = fct_reorder(term, estimate)) %>% 
+  ggplot(aes(term, estimate)) +
+  geom_col() + 
+  scale_y_continuous(limits = c(-.25, .25)) +
+  coord_flip()
+```
