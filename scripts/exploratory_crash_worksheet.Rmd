@@ -17,8 +17,11 @@ library(janitor)
 library(lubridate)
 library(viridis)
 library(ggmap)
+library(broom)
 
 theme_set(theme_bw(base_size = 18))
+
+options(scipen = 999, digits = 4)
 ```
 
 
@@ -62,7 +65,6 @@ df %>%
 ```
 
 ```{r}
-
 df %>% 
   ggplot(aes(hour_of_day)) +
   geom_histogram()
@@ -89,6 +91,39 @@ df %>%
 ```
 
 ```{r}
+df %>% 
+  ggplot(aes(speed_limit)) +
+  geom_freqpoly()
+```
+
+```{r}
+df %>%
+  count(speed_limit, speeding_related) %>% 
+  ggplot(aes(speed_limit, n, color = as.factor(speeding_related))) +
+  geom_point()
+```
+
+```{r}
+df %>% 
+  ggplot(aes(as.integer(injury_or_fatal))) +
+  geom_histogram()
+```
+
+```{r}
+df %>%
+  select(contains("fatal", "inj")) -> df_casualties
+
+df_casualties %>% 
+  ggplot(aes(fatal_count)) +
+  geom_freqpoly() +
+  geom_rug()
+
+df_casualties %>% 
+  ggplot(aes(as.logical(injury_or_fatal))) +
+  geom_bar()
+```
+
+```{r}
 colnames(df)
 
 df %>% 
@@ -102,7 +137,8 @@ df_environmental_factors %>%
   ggplot(aes(x = environmental_measurement, y = n)) +
   geom_col() +
   facet_wrap(~environmental_factor,
-             scale = "free")
+             scale = "free",
+             ncol = 3)
 ```
 
 ```{r}
@@ -111,19 +147,17 @@ colnames(df)
 df %>% 
   select(crash_crn, total_units, person_count, vehicle_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, fatal_count, injury_count, maj_inj_count, mod_inj_count, min_inj_count, unk_inj_deg_count, unk_inj_per_count, unbelted_occ_count, unb_death_count, unb_maj_inj_count, belted_death_count, belted_maj_inj_count, mcycle_death_count, mcycle_maj_inj_count, bicycle_death_count, bicycle_maj_inj_count, ped_count, ped_death_count, ped_maj_inj_count, comm_veh_count) %>% 
   gather(accident_metadata, measurement, -crash_crn) ->  df_accident_metadata
-
 ```
 
 ```{r}
 df_accident_metadata %>% 
-  #count(accident_metadata, measurement) %>% 
-  ggplot(aes(x = measurement)) +
-  #geom_col() +
-  geom_density() +
+  count(accident_metadata, measurement) %>% 
+  ggplot(aes(x = measurement, y = n)) +
+  geom_col() +
+  #geom_density() +
   facet_wrap(~accident_metadata,
-             scale = "free",
-             ncol = 3) +
-  coord_flip()
+             scales = "free",
+             ncol = 4)
 ```
 
 
@@ -142,7 +176,10 @@ map_pgh
 
 ```{r}
 df %>% 
-  select(dec_lat, dec_long) %>% 
+  select(dec_lat, dec_long, hour_of_day, day_of_week) %>% 
+  filter(!is.na(hour_of_day),
+         hour_of_day < 24) %>% 
+  #count(hour_of_day, dec_lat, dec_long) %>% 
   filter(!is.na(dec_lat),
          !is.na(dec_long)) -> df_map
 ```
@@ -154,6 +191,49 @@ map_pgh +
                       fill = ..level..),
                   geom = "polygon",
                   alpha = .5) +
+  scale_fill_viridis()
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  facet_wrap(~hour_of_day) +
+  theme_void()
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  facet_wrap(~day_of_week) +
+  theme_void()
+```
+
+```{r}
+df %>% 
+  mutate(casualties = fatal_count + injury_count,
+         icy_road = as.logical(icy_road),
+         speeding_related = as.logical(speeding_related),
+         rear_end = as.logical(rear_end)) %>% 
+  select(casualties, speeding_related, speed_limit, day_of_week, hour_of_day, icy_road, rear_end, dec_lat, dec_long) %>% 
+  filter(casualties > 1) -> df_casualties_map
+
+map_pgh +
+  stat_density_2d(data = df_casualties_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  #geom_point(data = df_casualties_map, aes(dec_long, dec_lat, size = log10(casualties), alpha = .001), color = "red") +
   scale_fill_viridis() +
   theme_void()
 ```
