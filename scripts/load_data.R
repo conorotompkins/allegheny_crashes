@@ -1,4 +1,4 @@
-library(tidyverse)
+library(tidyverse
 library(janitor)
 
 urls <- c("https://data.wprdc.org/dataset/3130f583-9499-472b-bb5a-f63a6ff6059a/resource/17012686-77d8-477b-b034-5b4a4715ec53/download/2004alcocrash.csv",
@@ -53,13 +53,4 @@ dfs[[14]] <- read_csv(urls[14], col_types = cols(.default = "c"))
 bind_rows(dfs) %>%
   clean_names() -> df
 
-write_csv(df, "data/combined_allegheny_county_crash_data_2004-2017.csv")
-  
-  
-colnames(df)
-
-df %>% 
-  count(crash_year) %>% 
-  ggplot(aes(crash_year, n, group = 1)) +
-  geom_line() +
-  scale_y_continuous(limits = c(0, 15000))
+#write_csv(df, "data/combined_allegheny_county_crash_data_2004-2017.csv")
