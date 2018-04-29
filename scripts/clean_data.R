@@ -30,12 +30,3 @@ df_unique_values %>%
 (df_columns %>% 
   left_join(df_unique_values) %>% 
   arrange(desc(unique_values), column_name, desc(n)) -> df_columns)
-
-
-
-df_dictionary <- read_csv("data/crashdatadictionary.csv") %>%
-  clean_names() %>% 
-  fill(column_name, description, data_type, .direction = "down")
-
-df_dictionary
-
