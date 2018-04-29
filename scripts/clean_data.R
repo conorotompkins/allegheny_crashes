@@ -5,7 +5,6 @@ library(skimr)
 theme_set(theme_bw())
 
 df <- read_csv("data/combined_allegheny_county_crash_data_2004-2017.csv")
-?`skimr-package`
 
 (df %>% 
     #select(-c(id, crash_crn, flag_crn, roadway_crn, latitude, longitude, dec_lat, dec_long)) %>% 
