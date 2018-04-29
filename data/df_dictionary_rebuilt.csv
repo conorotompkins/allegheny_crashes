@@ -1,0 +1,394 @@
+column_name,description,data_type,code,readable
+ACCESS_CTRL,Access Control Code,TEXT,NA,NA
+ADJ_RDWY_SEQ,Adjusted Roadway Sequence Number,NUMBER,NA,NA
+AUTOMOBILE_COUNT,Total Amount of Automobiles Involved,NUMBER,NA,NA
+BELTED_DEATH_COUNT,Total Deaths of belted occupants,NUMBER,NA,NA
+BELTED_MAJ_INJ_COUNT,Total Major Injuries of belted occupants,NUMBER,NA,NA
+BICYCLE_COUNT,Total amount of Bicycles involved,NUMBER,NA,NA
+BICYCLE_DEATH_COUNT,Total amount of Bicyclist Fatalities,NUMBER,NA,NA
+BICYCLE_MAJ_INJ_COUNT,Total amount of Bicyclist Major Injuries,NUMBER,NA,NA
+BUS_COUNT,Total amount of Buses involved,NUMBER,NA,NA
+COLLISION_TYPE,Collision category that defines the crash,TEXT,0,Non
+COLLISION_TYPE,Collision category that defines the crash,TEXT,1,Rear
+COLLISION_TYPE,Collision category that defines the crash,TEXT,2,Head
+COLLISION_TYPE,Collision category that defines the crash,TEXT,3,Rear
+COLLISION_TYPE,Collision category that defines the crash,TEXT,4,Angle
+COLLISION_TYPE,Collision category that defines the crash,TEXT,5,Sideswipe
+COLLISION_TYPE,Collision category that defines the crash,TEXT,6,Sideswipe
+COLLISION_TYPE,Collision category that defines the crash,TEXT,7,Hit
+COLLISION_TYPE,Collision category that defines the crash,TEXT,8,Hit
+COLLISION_TYPE,Collision category that defines the crash,TEXT,9,Other
+COMM_VEH_COUNT,Total Commercial vehicles involved,NUMBER,NA,NA
+CONS_ZONE_SPD_LIM,Speed limit for the Construction Zone,TEXT,NA,NA
+COUNTY,County Code Number where crash occurred,TEXT,02,Allegheny
+CRASH_CRN,Crash Record Number,NUMBER,NA,NA
+CRASH_MONTH,Month when the crash occurred,TEXT,NA,NA
+CRASH_YEAR,Year when the crash occurred,TEXT,NA,NA
+CRN,Crash Record Number,NUMBER,NA,NA
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,1,Sunday
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,2,Monday
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,3,Tuesday
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,4,Wednesday
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,5,Thursday
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,6,Friday
+DAY_OF_WEEK,Day of the Week code when crash occurred,TEXT,7,Saturday
+DEC_LAT,Decimal Latitude for SR's,NUMBER,NA,NA
+DEC_LONG,Decimal Longitude for SR's,NUMBER,NA,NA
+DISTRICT,District Number where crash occurred,TEXT,11,District
+DRIVER_COUNT_16YR,Total amount of 16 year old drivers,NUMBER,NA,NA
+DRIVER_COUNT_17YR,Total amount of 17 year old drivers,NUMBER,NA,NA
+DRIVER_COUNT_65_74YR,Total amount of 65 to 74 year old drivers,NUMBER,NA,NA
+DRIVER_COUNT_75PLUS,Total amount of drivers ages 75 and up,NUMBER,NA,NA
+FATAL_COUNT,Total amount of fatalities involved,NUMBER,NA,NA
+FLAG_CRN,Crash Record Number,NUMBER,NA,NA
+HEAVY_TRUCK_COUNT,Total amount of Heavy Trucks involved,NUMBER,NA,NA
+HOUR_OF_DAY,The hour of Day when the crash occurred,TEXT,NA,NA
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,1,Daylight
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,2,Dark
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,3,Dark
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,4,Dusk
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,5,Dawn
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,6,Dark
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,8,Other
+ILLUMINATION,Code that defines lighting at crash scene,TEXT,9,Unknown
+IMPAIRED_DRIVER,At least One Driver was Impaired by Drugs or Alcohol,NUMBER,NA,NA
+INJURY_COUNT,Total count of all injuries sustained,NUMBER,NA,NA
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,00,Mid
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,01,Four
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,02,T
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,03,Y
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,04,Traffic
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,05,Multi
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,06,On
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,07,Off
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,08,Crossover
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,09,Railroad
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,10,Other
+INTERSECT_TYPE,Code that defines the Intersection Type,TEXT,99,Unknown
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,1,North
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,2,South
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,3,East
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,4,West
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,5,North
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,6,East
+LN_CLOSE_DIR,Direction of traffic in closed lane (s),NUMBER,7,All
+LANE_COUNT,Travel Lane Count,TEXT,NA,NA
+LATITUDE,GPS Coordinates from Police if present,TEXT,NA,NA
+LOCATION_TYPE,Code that defines the crash location,TEXT,0,Not
+LOCATION_TYPE,Code that defines the crash location,TEXT,1,Underpass
+LOCATION_TYPE,Code that defines the crash location,TEXT,2,Ramp
+LOCATION_TYPE,Code that defines the crash location,TEXT,3,Bridge
+LOCATION_TYPE,Code that defines the crash location,TEXT,4,Tunnel
+LOCATION_TYPE,Code that defines the crash location,TEXT,5,Toll
+LOCATION_TYPE,Code that defines the crash location,TEXT,6,Cross
+LOCATION_TYPE,Code that defines the crash location,TEXT,7,Driveway
+LOCATION_TYPE,Code that defines the crash location,TEXT,8,Ramp
+LOCATION_TYPE,Code that defines the crash location,TEXT,9,Unknown
+LONGITUDE,GPS Coordinates from Police if present,TEXT,NA,NA
+MAJ_INJ_COUNT,Total amount of Major Injuries involved,NUMBER,NA,NA
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,0,Not
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,1,Killed
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,2,Major
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,3,Moderate
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,4,Minor
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,8,Injury
+MAX_SEVERITY_LEVEL,Injury severity level of the crash,TEXT,9,Unknown
+MCYCLE_DEATH_COUNT,Total amount of Motorcyclist fatalities,NUMBER,NA,NA
+MCYCLE_MAJ_INJ_COUNT,Total amount of Motorcyclist Major Injuries,NUMBER,NA,NA
+MIN_INJ_COUNT,Total amount of Minimal Injuries,NUMBER,NA,NA
+MOD_INJ_COUNT,Total amount of Moderate Injuries,NUMBER,NA,NA
+MOTORCYCLE_COUNT,Total amount of Motorcycles Involved,NUMBER,NA,NA
+MUNICIPALITY,County Municipality Code,TEXT,NA,NA
+OFFSET,Offset Number,TEXT,NA,NA
+PED_COUNT,Total amount of Pedestrians involved,NUMBER,NA,NA
+PED_DEATH_COUNT,Total amount of Pedestrian fatalities,NUMBER,NA,NA
+PED_MAJ_INJ_COUNT,Total amount of Pedestrian Major Injuries,NUMBER,NA,NA
+PERSON_COUNT,Total amount of people involved,NUMBER,NA,NA
+POLICE_AGCY,Code of the reporting Police Agency,TEXT,NA,NA
+RDWY_ORIENT,Roadway Orientation Code,TEXT,N,North
+RDWY_SEQ_NUM,Crash Roadway Sequence Number,NUMBER,NA,NA
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,1,Concrete
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,2,Blacktop
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,3,Brick
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,4,Slag
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,5,Dirt
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,8,Other
+RDWY_SURF_TYPE_CD,Code for the Roadway surface type,TEXT,9,Unknown
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,1,On
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,2,Shoulder
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,3,Median
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,4,Roadside
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,5,Outside
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,6,In
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,7,Gore
+RELATION_TO_ROAD,Code for the crash's relativity to the road,TEXT,9,Unknown
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,0,Dry
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,1,Wet
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,2,Sand
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,3,Snow
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,4,Slush
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,5,Ice
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,6,Ice
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,7,Water
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,8,Other
+ROAD_CONDITION,Roadway Surface Condition Code,TEXT,9,Unknown
+ROAD_OWNER,Road OWNER,TEXT,1,Interstate
+ROAD_OWNER,Road OWNER,TEXT,2,State
+ROAD_OWNER,Road OWNER,TEXT,3,County
+ROAD_OWNER,Road OWNER,TEXT,4,Local
+ROAD_OWNER,Road OWNER,TEXT,5,East
+ROAD_OWNER,Road OWNER,TEXT,6,Turnpike
+ROAD_OWNER,Road OWNER,TEXT,7,Private
+ROAD_OWNER,Road OWNER,TEXT,9,Other
+ROADWAY_COUNTY,County Code Number where crash occurred,TEXT,02,Allegheny
+ROADWAY_CRN,Crash Record Number,NUMBER,NA,NA
+ROUTE,Route Number,TEXT,NA,NA
+SEGMENT,Segment Number,TEXT,NA,NA
+SMALL_TRUCK_COUNT,Total amount of Small Trucks involved,NUMBER,NA,NA
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,0,No
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,1,National
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,2,Military
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,3,Indian
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,4,College
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,5,Other
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,8,Other
+SPEC_JURIS_CD,Special Jurisdiction Code,NUMBER,9,Unknown
+SPEED_LIMIT,Speed Limit,TEXT,NA,NA
+STREET_NAME,Name of the Roadway,TEXT,NA,NA
+SUV_COUNT,Total count of sport utility vehicles involved,NUMBER,NA,NA
+TCD_FUNC_CD,Code for Traffic Control Device state,NUMBER,0,No
+TCD_FUNC_CD,Code for Traffic Control Device state,NUMBER,1,Device
+TCD_FUNC_CD,Code for Traffic Control Device state,NUMBER,2,Device
+TCD_FUNC_CD,Code for Traffic Control Device state,NUMBER,3,Device
+TCD_FUNC_CD,Code for Traffic Control Device state,NUMBER,4,Emergency
+TCD_FUNC_CD,Code for Traffic Control Device state,NUMBER,9,Unknown
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,0,Not
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,1,Flashing
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,2,Traffic
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,3,Stop
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,4,Yield
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,5,Active
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,6,Passive
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,7,Police
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,8,Other
+TCD_TYPE,Code that defines the Traffic Control Device,TEXT,9,Unknown
+TIME_OF_DAY,The time of day when the crash occurred,TEXT,NA,NA
+UNB_DEATH_COUNT,No. of people killed not wearing a seatbelt,NUMBER,NA,NA
+UNB_MAJ_INJ_COUNT,Total # of unbelted sustaining Major Injuries,NUMBER,NA,NA
+UNBELTED_OCC_COUNT,Total count of all unbelted occupants,NUMBER,NA,NA
+UNK_INJ_DEG_COUNT,No. of injuries with unknown severity,NUMBER,NA,NA
+UNK_INJ_PER_COUNT,No. of people that are unknown if injured,NUMBER,NA,NA
+URBAN_RURAL,Code to classify crash as Urban or Rural,TEXT,1,RURAL
+URBAN_RURAL,Code to classify crash as Urban or Rural,TEXT,2,SMALL
+URBAN_RURAL,Code to classify crash as Urban or Rural,TEXT,3,URBANIZED
+URBAN_RURAL,Code to classify crash as Urban or Rural,TEXT,4,URBANIZED
+VAN_COUNT,Total amount of vans involved,NUMBER,NA,NA
+VEHICLE_COUNT,Total amount of all vehicles involved,NUMBER,NA,NA
+WEATHER,Code for the weather type at time of crash,TEXT,1,No
+WEATHER,Code for the weather type at time of crash,TEXT,2,Rain
+WEATHER,Code for the weather type at time of crash,TEXT,3,Sleet
+WEATHER,Code for the weather type at time of crash,TEXT,4,Snow
+WEATHER,Code for the weather type at time of crash,TEXT,5,Fog
+WEATHER,Code for the weather type at time of crash,TEXT,6,Rain
+WEATHER,Code for the weather type at time of crash,TEXT,7,Sleet
+WEATHER,Code for the weather type at time of crash,TEXT,8,Other
+WEATHER,Code for the weather type at time of crash,TEXT,9,Unknown
+WORK_ZONE_LOC,The Work Zone Location Code,TEXT,1,Before
+WORK_ZONE_LOC,The Work Zone Location Code,TEXT,2,Advance
+WORK_ZONE_LOC,The Work Zone Location Code,TEXT,3,Transition
+WORK_ZONE_LOC,The Work Zone Location Code,TEXT,4,Activity
+WORK_ZONE_LOC,The Work Zone Location Code,TEXT,5,Termination
+WORK_ZONE_LOC,The Work Zone Location Code,TEXT,8,Other
+WORK_ZONE_TYPE,Code to define the type of Work Zone,WORK_ZONE_TYPE,1,Construction
+WORK_ZONE_TYPE,Code to define the type of Work Zone,WORK_ZONE_TYPE,2,Maintenance
+WORK_ZONE_TYPE,Code to define the type of Work Zone,WORK_ZONE_TYPE,3,Utility
+AGGRESSIVE_DRIVING,Aggressive Driving Indicator,NUMBER,0,No
+ALCOHOL_RELATED,Alcohol Related Indicator,NUMBER,0,No
+BICYCLE,Bicycle Indicator,NUMBER,0,No
+CELL_PHONE,Driver Using Cell Phone Indicator,NUMBER,0,No
+COMM_VEHICLE,Crash has at least 1 involved Commercial Vehicle,NUMBER,0,No
+CROSS_MEDIAN,Cross Median Indicator,NUMBER,0,No
+CURVE_DVR_ERROR,Curve in Road Driver Error Indicator,NUMBER,0,No
+CURVED_ROAD,Curve in Road,NUMBER,0,No
+DEER_RELATED,Deer Related Indicator,NUMBER,0,No
+DISTRACTED,Distracted Driver Indicator,NUMBER,0,No
+DRINKING_DRIVER,Drinking Driver Indicator,NUMBER,0,No
+DRIVER_16YR,Driver is 16 Years of Age Indicator,NUMBER,0,No
+DRIVER_17YR,Driver is 17 Years of Age Indicator,NUMBER,0,No
+DRIVER_65_74YR,Driver is between 65 and 74 Indicator,NUMBER,0,No
+DRIVER_75PLUS,Driver is 75 Years of Age Plus Indicator,NUMBER,0,No
+FATAL,Fatality Indicator,NUMBER,0,No
+FATAL_OR_MAJ_INJ,Fatality or Major Injury Indicator,NUMBER,0,No
+FATIGUE_ASLEEP,Fatigue or Asleep Indicator,NUMBER,0,No
+FIRE_IN_VEHICLE,At least 1 Vehicle with Fire Damage,NUMBER,0,No
+HAZARDOUS_TRUCK,At least one Heavy Truck carrying Hazardous Material,NUMBER,0,No
+HIT_BARRIER,Hit Barrier Indicator,NUMBER,0,No
+HIT_BRIDGE,Hit Bridge Indicator,NUMBER,0,No
+HIT_DEER,Hit Deer Indicator,NUMBER,0,No
+HIT_EMBANKMENT,Hit Embankment Indicator,NUMBER,0,No
+HIT_FIXED_OBJECT,Hit Fixed Object Indicator,NUMBER,0,No
+HIT_GDRAIL,Hit Guide Rail Indicator,NUMBER,0,No
+HIT_GDRAIL_END,Hit Guide Rail End Indicator,NUMBER,0,No
+HIT_POLE,Hit Pole Indicator,NUMBER,0,No
+HIT_TREE_SHRUB,Hit Tree or Shrub Indicator,NUMBER,0,No
+HO_OPPDIR_SDSWP,Head on or Side Swipe Indicator,NUMBER,0,No
+HVY_TRUCK_RELATED,Heavy Truck Related Indicator,NUMBER,0,No
+ICY_ROAD,Icy Road Indicator,NUMBER,0,No
+ILLEGAL_DRUG_RELATED,At Least 1 Driver or Pedestrian had reported or suspected Illegal Drug Use,NUMBER,0,No
+ILLUMINATION_DARK,Illumination Indicates that the Crash Scene Lighting was Dark,NUMBER,0,No
+INJURY,Injury Indicator,NUMBER,0,No
+INJURY_OR_FATAL,At least 1 Person Was Injured or Killed in the Crash,NUMBER,0,No
+INTERSECTION,Intersection Indicator,NUMBER,0,No
+INTERSTATE,Non-Turnpike Interstate Indicator,NUMBER,0,No
+LIMIT_65MPH,65MPH Speed Limit Indicator,NUMBER,0,No
+LOCAL_ROAD,Local Road Indicator,NUMBER,0,No
+LOCAL_ROAD_ONLY,Local Road Only Indicator,NUMBER,0,No
+MAJOR_INJURY,At least 1 Person Sustained a Major Injury,NUMBER,0,No
+MC_DRINKING_DRIVER,At least 1 Motorcycle driver has reported or suspected Alcohol Use,NUMBER,0,No
+MINOR_INJURY,At least 1 Person Sustained a Minor Injury,NUMBER,0,No
+MODERATE_INJURY,At least 1 Person Sustained a Moderate Injury,NUMBER,0,No
+MOTORCYCLE,Motorcycle Indicator,NUMBER,0,No
+NHTSA_AGG_DRIVING,The Crash meets the NHTSA definition of Aggressive Driving,NUMBER,0,No
+NO_CLEARANCE,No Clearance Indicator,NUMBER,0,No
+NON_INTERSECTION,Non Intersection Indicator,NUMBER,0,No
+NTFY_HIWY_MAINT,PENNDOT highway maintenance notified?,TEXT,0,No
+OVERTURNED,Overturned Vehicle Indicator,NUMBER,0,No
+PEDESTRIAN,Pedestrian Indicator,NUMBER,0,No
+PHANTOM_VEHICLE,Phantom Vehicle Indicator,NUMBER,0,No
+PROPERTY_DAMAGE_ONLY,Property Damage Only Indicator,NUMBER,0,No
+PSP_REPORTED,Crash Investigated by the Pennsylvania State Police,NUMBER,0,No
+REAR_END,Rear End Collision Indicator,NUMBER,0,No
+RUNNING_RED_LT,Driver Running Red Light Indicator,NUMBER,0,No
+RUNNING_STOP_SIGN,Driver Running Stop Sign Indicator,NUMBER,0,No
+SCHOOL_BUS,School Bus Indicator,NUMBER,0,No
+SCHOOL_ZONE,School Zone Indicator,NUMBER,0,No
+SHLDR_RELATED,Shoulder Related Indicator,NUMBER,0,No
+SIGNALIZED_INT,Signalized Intersection Indicator,NUMBER,0,No
+SNOW_SLUSH_ROAD,Snow Slush Road Indicator,NUMBER,0,No
+SPEEDING,Speeding Indicator,NUMBER,0,No
+SPEEDING_RELATED,Speeding Related Indicator,NUMBER,0,No
+STATE_ROAD,State Road Indicator,NUMBER,0,No
+STOP_CONTROLLED_INT,Stop Controlled Intersection Indicator,NUMBER,0,No
+SUDDEN_DEER,Sudden Deer Indicator,NUMBER,0,No
+SV_RUN_OFF_RD,Single Vehicle Run Off Road Indicator,NUMBER,0,No
+TAILGATING,Tailgating Indicator,NUMBER,0,No
+TFC_DETOUR_IND,Was the Traffic Detoured? (Y/N),TEXT,0,No
+TRAIN,Train Indicator,NUMBER,0,No
+TRAIN_TROLLEY,Train or Trolley Indicator,NUMBER,0,No
+TROLLEY,Trolley Indicator,NUMBER,0,No
+TURNPIKE,Turnpike Indicator,NUMBER,0,No
+UNBELTED,Anyone in crash unbelted indicator,NUMBER,0,No
+UNDERAGE_DRNK_DRV,Under Age drinking driver Indicator,NUMBER,0,No
+UNLICENSED,Unlicensed Driver Indicator,NUMBER,0,No
+UNSIGNALIZED_INT,Unsignalized Intersection Indicator,NUMBER,0,No
+VEHICLE_FAILURE,Vehicle Failure Indicator,NUMBER,0,No
+VEHICLE_TOWED,Vehicle Towed Indicator,NUMBER,0,No
+WET_ROAD,Wet Road Indicator,NUMBER,0,No
+WORK_ZONE,Work Zone Indicator,NUMBER,0,No
+WK_ZONE_IND,Did the crash occur in a work zone (Y/N),TEXT,0,No
+WORKERS_PRES,Were construction personnel present? (Y/N),TEXT,0,No
+WZ_CLOSE_DETOUR,Was traffic rerouted due to work zone?(Y/N),TEXT,0,No
+WZ_FLAGGER,Did Work zone have a flagman? (Y/N),TEXT,0,No
+WZ_LAW_OFFCR_IND,Did Work zone have a patrolman? (Y/N),TEXT,0,No
+WZ_LN_CLOSURE,Did Work zone have a lane closure? (Y/N),TEXT,0,No
+WZ_MOVING,Was there moving work in the zone? (Y/N),TEXT,0,No
+WZ_OTHER,Was this a special type of work zone? (Y/N),TEXT,0,No
+WZ_SHLDER_MDN,Was a median/shoulder in the zone? (Y/N),TEXT,0,No
+AGGRESSIVE_DRIVING,Aggressive Driving Indicator,NUMBER,1,Yes
+ALCOHOL_RELATED,Alcohol Related Indicator,NUMBER,1,Yes
+BICYCLE,Bicycle Indicator,NUMBER,1,Yes
+CELL_PHONE,Driver Using Cell Phone Indicator,NUMBER,1,Yes
+COMM_VEHICLE,Crash has at least 1 involved Commercial Vehicle,NUMBER,1,Yes
+CROSS_MEDIAN,Cross Median Indicator,NUMBER,1,Yes
+CURVE_DVR_ERROR,Curve in Road Driver Error Indicator,NUMBER,1,Yes
+CURVED_ROAD,Curve in Road,NUMBER,1,Yes
+DEER_RELATED,Deer Related Indicator,NUMBER,1,Yes
+DISTRACTED,Distracted Driver Indicator,NUMBER,1,Yes
+DRINKING_DRIVER,Drinking Driver Indicator,NUMBER,1,Yes
+DRIVER_16YR,Driver is 16 Years of Age Indicator,NUMBER,1,Yes
+DRIVER_17YR,Driver is 17 Years of Age Indicator,NUMBER,1,Yes
+DRIVER_65_74YR,Driver is between 65 and 74 Indicator,NUMBER,1,Yes
+DRIVER_75PLUS,Driver is 75 Years of Age Plus Indicator,NUMBER,1,Yes
+FATAL,Fatality Indicator,NUMBER,1,Yes
+FATAL_OR_MAJ_INJ,Fatality or Major Injury Indicator,NUMBER,1,Yes
+FATIGUE_ASLEEP,Fatigue or Asleep Indicator,NUMBER,1,Yes
+FIRE_IN_VEHICLE,At least 1 Vehicle with Fire Damage,NUMBER,1,Yes
+HAZARDOUS_TRUCK,At least one Heavy Truck carrying Hazardous Material,NUMBER,1,Yes
+HIT_BARRIER,Hit Barrier Indicator,NUMBER,1,Yes
+HIT_BRIDGE,Hit Bridge Indicator,NUMBER,1,Yes
+HIT_DEER,Hit Deer Indicator,NUMBER,1,Yes
+HIT_EMBANKMENT,Hit Embankment Indicator,NUMBER,1,Yes
+HIT_FIXED_OBJECT,Hit Fixed Object Indicator,NUMBER,1,Yes
+HIT_GDRAIL,Hit Guide Rail Indicator,NUMBER,1,Yes
+HIT_GDRAIL_END,Hit Guide Rail End Indicator,NUMBER,1,Yes
+HIT_POLE,Hit Pole Indicator,NUMBER,1,Yes
+HIT_TREE_SHRUB,Hit Tree or Shrub Indicator,NUMBER,1,Yes
+HO_OPPDIR_SDSWP,Head on or Side Swipe Indicator,NUMBER,1,Yes
+HVY_TRUCK_RELATED,Heavy Truck Related Indicator,NUMBER,1,Yes
+ICY_ROAD,Icy Road Indicator,NUMBER,1,Yes
+ILLEGAL_DRUG_RELATED,At Least 1 Driver or Pedestrian had reported or suspected Illegal Drug Use,NUMBER,1,Yes
+ILLUMINATION_DARK,Illumination Indicates that the Crash Scene Lighting was Dark,NUMBER,1,Yes
+INJURY,Injury Indicator,NUMBER,1,Yes
+INJURY_OR_FATAL,At least 1 Person Was Injured or Killed in the Crash,NUMBER,1,Yes
+INTERSECTION,Intersection Indicator,NUMBER,1,Yes
+INTERSTATE,Non-Turnpike Interstate Indicator,NUMBER,1,Yes
+LIMIT_65MPH,65MPH Speed Limit Indicator,NUMBER,1,Yes
+LOCAL_ROAD,Local Road Indicator,NUMBER,1,Yes
+LOCAL_ROAD_ONLY,Local Road Only Indicator,NUMBER,1,Yes
+MAJOR_INJURY,At least 1 Person Sustained a Major Injury,NUMBER,1,Yes
+MC_DRINKING_DRIVER,At least 1 Motorcycle driver has reported or suspected Alcohol Use,NUMBER,1,Yes
+MINOR_INJURY,At least 1 Person Sustained a Minor Injury,NUMBER,1,Yes
+MODERATE_INJURY,At least 1 Person Sustained a Moderate Injury,NUMBER,1,Yes
+MOTORCYCLE,Motorcycle Indicator,NUMBER,1,Yes
+NHTSA_AGG_DRIVING,The Crash meets the NHTSA definition of Aggressive Driving,NUMBER,1,Yes
+NO_CLEARANCE,No Clearance Indicator,NUMBER,1,Yes
+NON_INTERSECTION,Non Intersection Indicator,NUMBER,1,Yes
+NTFY_HIWY_MAINT,PENNDOT highway maintenance notified?,TEXT,1,Yes
+OVERTURNED,Overturned Vehicle Indicator,NUMBER,1,Yes
+PEDESTRIAN,Pedestrian Indicator,NUMBER,1,Yes
+PHANTOM_VEHICLE,Phantom Vehicle Indicator,NUMBER,1,Yes
+PROPERTY_DAMAGE_ONLY,Property Damage Only Indicator,NUMBER,1,Yes
+PSP_REPORTED,Crash Investigated by the Pennsylvania State Police,NUMBER,1,Yes
+REAR_END,Rear End Collision Indicator,NUMBER,1,Yes
+RUNNING_RED_LT,Driver Running Red Light Indicator,NUMBER,1,Yes
+RUNNING_STOP_SIGN,Driver Running Stop Sign Indicator,NUMBER,1,Yes
+SCHOOL_BUS,School Bus Indicator,NUMBER,1,Yes
+SCHOOL_ZONE,School Zone Indicator,NUMBER,1,Yes
+SHLDR_RELATED,Shoulder Related Indicator,NUMBER,1,Yes
+SIGNALIZED_INT,Signalized Intersection Indicator,NUMBER,1,Yes
+SNOW_SLUSH_ROAD,Snow Slush Road Indicator,NUMBER,1,Yes
+SPEEDING,Speeding Indicator,NUMBER,1,Yes
+SPEEDING_RELATED,Speeding Related Indicator,NUMBER,1,Yes
+STATE_ROAD,State Road Indicator,NUMBER,1,Yes
+STOP_CONTROLLED_INT,Stop Controlled Intersection Indicator,NUMBER,1,Yes
+SUDDEN_DEER,Sudden Deer Indicator,NUMBER,1,Yes
+SV_RUN_OFF_RD,Single Vehicle Run Off Road Indicator,NUMBER,1,Yes
+TAILGATING,Tailgating Indicator,NUMBER,1,Yes
+TFC_DETOUR_IND,Was the Traffic Detoured? (Y/N),TEXT,1,Yes
+TRAIN,Train Indicator,NUMBER,1,Yes
+TRAIN_TROLLEY,Train or Trolley Indicator,NUMBER,1,Yes
+TROLLEY,Trolley Indicator,NUMBER,1,Yes
+TURNPIKE,Turnpike Indicator,NUMBER,1,Yes
+UNBELTED,Anyone in crash unbelted indicator,NUMBER,1,Yes
+UNDERAGE_DRNK_DRV,Under Age drinking driver Indicator,NUMBER,1,Yes
+UNLICENSED,Unlicensed Driver Indicator,NUMBER,1,Yes
+UNSIGNALIZED_INT,Unsignalized Intersection Indicator,NUMBER,1,Yes
+VEHICLE_FAILURE,Vehicle Failure Indicator,NUMBER,1,Yes
+VEHICLE_TOWED,Vehicle Towed Indicator,NUMBER,1,Yes
+WET_ROAD,Wet Road Indicator,NUMBER,1,Yes
+WORK_ZONE,Work Zone Indicator,NUMBER,1,Yes
+WK_ZONE_IND,Did the crash occur in a work zone (Y/N),TEXT,1,Yes
+WORKERS_PRES,Were construction personnel present? (Y/N),TEXT,1,Yes
+WZ_CLOSE_DETOUR,Was traffic rerouted due to work zone?(Y/N),TEXT,1,Yes
+WZ_FLAGGER,Did Work zone have a flagman? (Y/N),TEXT,1,Yes
+WZ_LAW_OFFCR_IND,Did Work zone have a patrolman? (Y/N),TEXT,1,Yes
+WZ_LN_CLOSURE,Did Work zone have a lane closure? (Y/N),TEXT,1,Yes
+WZ_MOVING,Was there moving work in the zone? (Y/N),TEXT,1,Yes
+WZ_OTHER,Was this a special type of work zone? (Y/N),TEXT,1,Yes
+WZ_SHLDER_MDN,Was a median/shoulder in the zone? (Y/N),TEXT,1,Yes
+SCH_BUS_IND,Did the crash involve a School Bus? (Y/N),TEXT,N,No
+SCH_ZONE_IND,Did the crash occur in a School Zone? (Y/N),TEXT,N,No
+SCH_BUS_IND,Did the crash involve a School Bus? (Y/N),TEXT,Y,Yes
+SCH_ZONE_IND,Did the crash occur in a School Zone? (Y/N),TEXT,Y,Yes
+LANE_CLOSED,Was there a lane closure? (Y/N),TEXT,0,N
+LANE_CLOSED,Was there a lane closure? (Y/N),TEXT,1,Y
