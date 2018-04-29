@@ -1,9 +1,11 @@
 library(tidyverse)
 library(janitor)
+library(snakecase)
 
 read_csv("data/crashdatadictionary.csv") %>%
   clean_names() %>% 
-  fill(column_name, description, data_type, .direction = "down") -> df_dictionary 
+  fill(column_name, description, data_type, .direction = "down") %>% 
+  mutate(column_name = to_any_case(column_name)) -> df_dictionary 
 
 (df_dictionary %>% 
   filter(codes == "0 = No, 1 = Yes") -> df_dictionary_boolean_1)
