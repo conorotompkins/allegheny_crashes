@@ -24,24 +24,26 @@ options(scipen = 999, digits = 4)
 ```
 
 ```{r}
-read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/all-crashes2004-2016.csv") %>% 
-  clean_names() %>% 
-  mutate(crash_month = month(as.integer(crash_month), label = TRUE),
-         day_of_week = wday(as.integer(day_of_week), label = TRUE),
-         day_of_week = fct_shift(day_of_week, n = 1),
-         time_of_day = as.integer(time_of_day),
-         hour_of_day = as.integer(hour_of_day),
-         casualties = fatal_count + injury_count,
-         icy_road = as.logical(icy_road),
-         wet_road = as.logical(wet_road),
-         sudden_deer = as.logical(sudden_deer),
-         workers_pres = as.logical(workers_pres),
-         speeding_related = as.logical(speeding_related),
-         rear_end = as.logical(rear_end)) -> df
+df <- read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/df_combined_allegheny_county_crash_data_2004_2017_factorized.csv") #%>% 
+  #clean_names() %>% 
+  #mutate(crash_month = month(as.integer(crash_month), label = TRUE),
+  #       day_of_week = wday(as.integer(day_of_week), label = TRUE),
+  #       day_of_week = fct_shift(day_of_week, n = 1),
+  #       time_of_day = as.integer(time_of_day),
+  #       hour_of_day = as.integer(hour_of_day),
+  #       casualties = fatal_count + injury_count,
+  #       icy_road = as.logical(icy_road),
+  #       wet_road = as.logical(wet_road),
+  #       sudden_deer = as.logical(sudden_deer),
+  #       workers_pres = as.logical(workers_pres),
+  #       speeding_related = as.logical(speeding_related),
+  #       rear_end = as.logical(rear_end)) -> df
 ```
 
 ```{r}
-df -> df_model
+df %>% 
+  mutate(casualties = fatal_count + injury_count) %>% 
+  select(casualties, crash_year, crash_month, day_of_week, hour_of_day, illumination, weather, road_condition) -> df_model
 
 df_model %>% 
   ggplot(aes(casualties)) +
