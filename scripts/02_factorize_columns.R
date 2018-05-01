@@ -1,4 +1,4 @@
-#df <- read_csv("data/combined_allegheny_county_crash_data_2004-2017_raw.csv")
+#df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv")
 
 df_dictionary <- read_csv("data/df_dictionary_rebuilt.csv") %>% 
   filter(!is.na(code))
