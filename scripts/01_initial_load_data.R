@@ -51,3 +51,5 @@ dfs[[14]] <- read_csv(urls[14], col_types = cols(.default = "c"))
 
 bind_rows(dfs) %>%
   clean_names() -> df_combined_allegheny_county_crash_data_2004_2017_raw
+
+#write_csv(df_combined_allegheny_county_crash_data_2004_2017_raw, "data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv")
