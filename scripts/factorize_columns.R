@@ -92,3 +92,112 @@ df %>%
   mutate(rdwy_surf_type_cd = as.factor(readable)) %>% 
   select(-readable) -> df
 levels(df$rdwy_surf_type_cd)
+
+
+df %>% 
+  mutate(relation_to_road = as.character(relation_to_road)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "relation_to_road") %>% select(code, readable), c("relation_to_road" = "code")) %>% 
+  mutate(relation_to_road = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$relation_to_road)
+
+
+df %>% 
+  mutate(road_condition = as.character(road_condition)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "road_condition") %>% select(code, readable), c("road_condition" = "code")) %>% 
+  mutate(road_condition = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$road_condition)
+
+df %>% 
+  mutate(road_owner = as.character(road_owner)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "road_owner") %>% select(code, readable), c("road_owner" = "code")) %>% 
+  mutate(road_owner = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$road_owner)
+
+df %>% 
+  mutate(roadway_county = as.character(roadway_county)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "roadway_county") %>% select(code, readable), c("roadway_county" = "code")) %>% 
+  mutate(roadway_county = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$roadway_county)
+
+df %>% 
+  mutate(spec_juris_cd = as.character(spec_juris_cd)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "spec_juris_cd") %>% select(code, readable), c("spec_juris_cd" = "code")) %>% 
+  mutate(spec_juris_cd = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$spec_juris_cd)
+
+df %>% 
+  mutate(tcd_func_cd = as.character(tcd_func_cd)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "tcd_func_cd") %>% select(code, readable), c("tcd_func_cd" = "code")) %>% 
+  mutate(tcd_func_cd = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$tcd_func_cd)
+
+df %>% 
+  mutate(urban_rural = as.character(urban_rural)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "urban_rural") %>% select(code, readable), c("urban_rural" = "code")) %>% 
+  mutate(urban_rural = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$urban_rural)
+
+df %>% 
+  mutate(weather = as.character(weather)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "weather") %>% select(code, readable), c("weather" = "code")) %>% 
+  mutate(weather = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$weather)
+
+df %>% 
+  mutate(work_zone_loc = as.character(work_zone_loc)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "work_zone_loc") %>% select(code, readable), c("work_zone_loc" = "code")) %>% 
+  mutate(work_zone_loc = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$work_zone_loc)
+
+df %>% 
+  mutate(work_zone_type = as.character(work_zone_type)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "work_zone_type") %>% select(code, readable), c("work_zone_type" = "code")) %>% 
+  mutate(work_zone_type = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$work_zone_type)
+
+
+df %>% 
+  mutate(aggressive_driving = as.character(aggressive_driving)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "aggressive_driving") %>% select(code, readable), c("aggressive_driving" = "code")) %>% 
+  mutate(aggressive_driving = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$aggressive_driving)
+
+df %>% 
+  mutate(alcohol_related = as.character(alcohol_related)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "alcohol_related") %>% select(code, readable), c("alcohol_related" = "code")) %>% 
+  mutate(alcohol_related = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$alcohol_related)
+
+df %>% 
+  mutate(bicycle = as.character(bicycle)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "bicycle") %>% select(code, readable), c("bicycle" = "code")) %>% 
+  mutate(bicycle = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$bicycle)
+
+cell_phone
+df %>% 
+  mutate(cell_phone = as.character(cell_phone)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "cell_phone") %>% select(code, readable), c("cell_phone" = "code")) %>% 
+  mutate(cell_phone = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$cell_phone)
+
+df %>% 
+  mutate(cell_phone = as.character(cell_phone)) %>% 
+  left_join(df_dictionary %>% filter(column_name == "cell_phone") %>% select(code, readable), c("cell_phone" = "code")) %>% 
+  mutate(cell_phone = as.factor(readable)) %>% 
+  select(-readable) -> df
+levels(df$cell_phone)
