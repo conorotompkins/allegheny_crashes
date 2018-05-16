@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
 ```{r}
@@ -17,6 +17,7 @@ library(lubridate)
 library(viridis)
 library(ggmap)
 library(broom)
+library(modelr)
 
 theme_set(theme_bw(base_size = 18))
 
@@ -24,20 +25,11 @@ options(scipen = 999, digits = 4)
 ```
 
 ```{r}
-df <- read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/df_combined_allegheny_county_crash_data_2004_2017_factorized.csv") #%>% 
-  #clean_names() %>% 
-  #mutate(crash_month = month(as.integer(crash_month), label = TRUE),
-  #       day_of_week = wday(as.integer(day_of_week), label = TRUE),
-  #       day_of_week = fct_shift(day_of_week, n = 1),
-  #       time_of_day = as.integer(time_of_day),
-  #       hour_of_day = as.integer(hour_of_day),
-  #       casualties = fatal_count + injury_count,
-  #       icy_road = as.logical(icy_road),
-  #       wet_road = as.logical(wet_road),
-  #       sudden_deer = as.logical(sudden_deer),
-  #       workers_pres = as.logical(workers_pres),
-  #       speeding_related = as.logical(speeding_related),
-  #       rear_end = as.logical(rear_end)) -> df
+source("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/scripts/03_clean_data.R")
+
+df <- df_combined_allegheny_county_crash_data_2004_2017_cleaned
+
+rm(df_combined_allegheny_county_crash_data_2004_2017_cleaned, df_combined_allegheny_county_crash_data_2004_2017_factorized)
 ```
 
 ```{r}
@@ -48,7 +40,44 @@ df %>%
 df_model %>% 
   ggplot(aes(casualties)) +
   geom_freqpoly()
+```
 
+```{r}
+df %>% 
+  count(illumination, weather) %>% 
+  complete(illumination, weather) %>% 
+  replace_na(list(n = 0)) %>% 
+  arrange(desc(n)) %>% 
+  mutate(illumination = fct_reorder(illumination, desc(n)),
+         weather = fct_reorder(weather, desc(n))) %>% 
+  ggplot(aes(illumination, weather, fill = log10(n))) +
+  geom_tile() +
+  coord_equal() +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_fill_viridis() +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  count(road_condition, weather) %>% 
+  complete(road_condition, weather) %>% 
+  replace_na(list(n = 0)) %>% 
+  arrange(desc(n)) %>% 
+  mutate(road_condition = fct_reorder(road_condition, desc(n)),
+         weather = fct_reorder(weather, desc(n))) %>% 
+  ggplot(aes(road_condition, weather, fill = log10(n))) +
+  geom_tile() +
+  coord_equal() +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_fill_viridis() +
+  theme(panel.grid = element_blank())
+```
+
+
+```{r}
 model1 <- lm(casualties ~ ., data = df_model)
 tidy(model1) %>% 
   filter(term != "(Intercept)") %>% 
@@ -59,3 +88,34 @@ tidy(model1) %>%
   scale_y_continuous(limits = c(-.25, .25)) +
   coord_flip()
 ```
+
+```{r}
+df_model %>% 
+  add_predictions(model1) %>%
+  add_residuals(model1) -> df_results
+```
+
+
+```{r}
+df_results %>% 
+  ggplot(aes(casualties, pred)) +
+  geom_density_2d(aes(fill = ..level..), geom = "polygon") +
+  scale_fill_viridis()
+```
+
+```{r}
+df_results %>% 
+  select(hour_of_day, casualties, pred) %>% 
+  gather(measure, value, -hour_of_day) %>% 
+  ggplot(aes(hour_of_day, value, color = measure)) +
+  geom_smooth()
+```
+
+```{r}
+df_results %>% 
+  ggplot(aes(day_of_week))
+  
+  
+```
+
+
