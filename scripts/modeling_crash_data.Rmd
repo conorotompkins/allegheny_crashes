@@ -5,6 +5,15 @@ date: "April 24, 2018"
 output: html_document
 ---
 
+#Notes
+
+*change crash_year to years_since_2014
+*need to deal with cyclical nature of hour
+**use sin() and cos()
+***xhour = sin(2pi * hour_of_day/24), yhour = cos(2pi * hour_of_day/24)
+
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 ```
