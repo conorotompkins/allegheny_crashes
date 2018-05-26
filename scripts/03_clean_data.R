@@ -26,4 +26,4 @@ df_combined_allegheny_county_crash_data_2004_2017_cleaned %>%
          wz_law_offcr_ind = factor(wz_law_offcr_ind, levels = c("Y", "N", "U")),
          ntfy_hiwy_maint = case_when(ntfy_hiwy_maint == "N" ~ FALSE,
                                      ntfy_hiwy_maint == "Y" ~ TRUE)) %>% 
-  filter(hour_of_day <= 23) -> df_combined_allegheny_county_crash_data_2004_2017_cleaned
+  filter(hour_of_day <= 23) -> df
