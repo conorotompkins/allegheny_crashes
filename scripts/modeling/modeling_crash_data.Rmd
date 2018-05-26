@@ -1,0 +1,204 @@
+---
+title: "modeling_crash_data"
+author: "Conor Tompkins"
+date: "April 24, 2018"
+output: html_document
+---
+
+#Notes
+
+*change crash_year to years_since_2014
+*need to deal with cyclical nature of hour
+**use sin() and cos()
+***xhour = sin(2pi * hour_of_day/24), yhour = cos(2pi * hour_of_day/24)
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(lubridate)
+library(viridis)
+library(ggmap)
+library(broom)
+library(modelr)
+
+theme_set(theme_bw(base_size = 18))
+
+options(scipen = 999, digits = 4)
+```
+
+```{r}
+source("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/scripts/03_clean_data.R")
+
+df <- df_combined_allegheny_county_crash_data_2004_2017_cleaned
+
+rm(df_combined_allegheny_county_crash_data_2004_2017_cleaned, df_combined_allegheny_county_crash_data_2004_2017_factorized)
+```
+
+```{r}
+df %>% 
+  count(illumination, weather) %>% 
+  complete(illumination, weather) %>% 
+  replace_na(list(n = 0)) %>% 
+  arrange(desc(n)) %>% 
+  mutate(illumination = fct_reorder(illumination, desc(n)),
+         weather = fct_reorder(weather, desc(n))) %>% 
+  ggplot(aes(illumination, weather, fill = log10(n))) +
+  geom_tile() +
+  coord_equal() +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_fill_viridis() +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  count(road_condition, weather) %>% 
+  complete(road_condition, weather) %>% 
+  replace_na(list(n = 0)) %>% 
+  arrange(desc(n)) %>% 
+  mutate(road_condition = fct_reorder(road_condition, desc(n)),
+         weather = fct_reorder(weather, desc(n))) %>% 
+  ggplot(aes(road_condition, weather, fill = log10(n))) +
+  geom_tile() +
+  coord_equal() +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_fill_viridis() +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  mutate(casualties = fatal_count + injury_count) %>%
+  ggplot(aes(casualties, vehicle_count)) +
+  geom_jitter() +
+  geom_smooth()
+```
+
+```{r}
+df %>% 
+  mutate(casualties = fatal_count + injury_count) %>% 
+  select(casualties, illumination, road_condition, vehicle_count, collision_type, speed_limit, speeding) -> df_model
+
+df_model %>% 
+  ggplot(aes(casualties)) +
+  geom_freqpoly()
+```
+
+
+
+
+```{r}
+model1 <- lm(casualties ~ ., data = df_model)
+tidy(model1) %>% 
+  filter(term != "(Intercept)") %>% 
+  #arrange(desc(estimate)) %>% 
+  mutate(term = fct_reorder(term, estimate)) %>% 
+  ggplot(aes(term, estimate)) +
+  geom_col() + 
+  #scale_y_continuous(limits = c(-.25, .25)) +
+  coord_flip()
+
+glance(model1)
+```
+
+```{r}
+df_model %>% 
+  na.omit() %>% 
+  add_predictions(model1) %>%
+  add_residuals(model1) -> df_results
+```
+
+
+```{r}
+df_results %>% 
+  ggplot(aes(casualties, pred)) +
+  stat_density2d(aes(fill = ..density..), geom = "raster", contour = FALSE)
+```
+
+```{r}
+df_results %>% 
+  ggplot(aes(casualties, pred)) +
+  geom_smooth()
+```
+
+```{r}
+df_results %>% 
+  ggplot(aes(casualties, resid)) +
+  geom_smooth()
+```
+
+```{r}
+df_results %>% 
+  ggplot(aes(casualties, pred)) +
+  stat_density2d(aes(fill = ..level..), geom = "polygon") +
+  scale_fill_viridis() #+
+  #scale_x_continuous(limits = c(0, 50))
+```
+
+```{r eval = FALSE}
+df_results %>% 
+  select(crash_year, casualties, pred) %>% 
+  gather(measure, value, -crash_year) %>% 
+  ggplot(aes(crash_year, value, color = measure)) +
+  geom_smooth()
+```
+
+```{r}
+df_results %>% 
+  select(crash_month, casualties, pred) %>% 
+  gather(measure, value, -crash_month) %>% 
+  ggplot(aes(crash_month, value, color = measure)) +
+  geom_jitter(alpha = .1)
+```
+
+```{r}
+df_results %>% 
+  select(day_of_week, casualties, pred) %>% 
+  gather(measure, value, -day_of_week) %>% 
+  ggplot(aes(day_of_week, value, color = measure)) +
+  geom_jitter(alpha = .1)
+```
+
+```{r}
+df_results %>% 
+  select(hour_of_day, casualties, pred) %>% 
+  gather(measure, value, -hour_of_day) %>% 
+  ggplot(aes(hour_of_day, value, color = measure)) +
+  geom_smooth()
+```
+
+```{r}
+df_results %>% 
+  select(road_condition, casualties, pred) %>% 
+  gather(measure, value, -road_condition) %>% 
+  ggplot(aes(road_condition, value, color = measure)) +
+  geom_jitter(alpha = .1)
+```
+
+
+```{r}
+df_results %>% 
+  select(illumination, casualties, pred) %>% 
+  gather(measure, value, -illumination) %>% 
+  ggplot(aes(illumination, value, color = measure)) +
+  geom_jitter(alpha = .1)
+```
+
+```{r}
+df_results %>% 
+  select(vehicle_count, casualties, pred) %>% 
+  gather(measure, value, -vehicle_count) %>% 
+  ggplot(aes(vehicle_count, value, color = measure)) +
+  geom_jitter(alpha = .1) +
+  geom_smooth()
+```
+
