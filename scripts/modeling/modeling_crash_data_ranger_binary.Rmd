@@ -98,7 +98,8 @@ df %>%
   geom_col() +
   coord_flip()
 
-#colnames(df)
+colnames(df)
+
 df %>% 
   select(fatal, crash_year, day_of_week, hour_of_day, weather, illumination, road_condition, collision_type, relation_to_road, urban_rural, speed_limit, person_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, ped_count, speeding, cell_phone, alcohol_related, drinking_driver, aggressive_driving, fatigue_asleep, running_red_lt, running_stop_sign, tailgating, cross_median, impaired_driver)  %>% 
   mutate_at(vars(speeding:impaired_driver), as.integer) %>% 
