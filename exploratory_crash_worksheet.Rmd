@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,
+knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE)
 
 getwd()
@@ -29,27 +29,61 @@ options(scipen = 999, digits = 4)
 
 
 ```{r}
+source("scripts/02_factorize_columns.R")
 source("scripts/03_clean_data.R")
 
 df <- data
 rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
+
+df %>% 
+  filter(crash_year == 2015) %>% 
+  count(crash_year, crash_month, day_of_week, day_of_week_old) -> test
 ```
 
 ```{r}
 df %>% 
-  distinct(crash_year)
-
-df %>% 
-  count(crash_year) %>% 
-  ggplot(aes(crash_year, n)) +
+  count(crash_year, crash_month) %>%
+  mutate(time_period = str_c(crash_year, crash_month, sep = "-"),
+         time_period = fct_inorder(time_period)) %>% 
+  ggplot(aes(crash_month, n, color = as.factor(crash_year), group = crash_year)) +
     geom_line()
 ```
+```{r}
+df %>% 
+  count(crash_year, day_of_week) %>% 
+  ggplot(aes(day_of_week, n)) +
+    geom_col() +
+    facet_wrap(~crash_year, ncol = 1)
+```
+
 
 ```{r}
 df %>% 
-  distinct(crash_month)
+  count(crash_year, crash_month, day_of_week) %>%
+  mutate(time_period = str_c(crash_year, crash_month, day_of_week, sep = "-"),
+         time_period = fct_inorder(time_period)) %>% 
+  ggplot(aes(time_period, n, group = 1)) +
+    geom_jitter(alpha = .1) +
+    geom_smooth() +
+  labs(x = "Year-Month-Weekday") +
+  theme(axis.text.x = element_blank())
+```
 
+```{r}
 df %>% 
+  count(crash_year, crash_month, day_of_week, hour_of_day) %>%
+  mutate(time_period = str_c(crash_year, crash_month, day_of_week, hour_of_day, sep = "-"),
+         time_period = fct_inorder(time_period)) %>% 
+  ggplot(aes(time_period, n, group = 1)) +
+    geom_jitter(alpha = .01) +
+    geom_smooth() +
+  labs(x = "Year-Month-Weekday-Hour") +
+  theme(axis.text.x = element_blank())
+```
+
+```{r}
+df %>% 
+  mutate(crash_month = fct_rev(crash_month)) %>% 
   count(crash_year, crash_month) %>% 
   ggplot(aes(crash_year, crash_month, fill = n)) +
     geom_tile() +
@@ -61,10 +95,6 @@ df %>%
 ```
 
 ```{r}
-df %>% 
-  ggplot(aes(hour_of_day)) +
-  geom_histogram()
-
 df %>% 
   mutate(day_of_week = fct_rev(day_of_week)) %>% 
   filter(!hour_of_day > 24,
@@ -83,153 +113,93 @@ df %>%
   filter(!time_of_day > 2400,
          !is.na(day_of_week)) %>% 
   ggplot(aes(time_of_day, color = day_of_week)) +
-  geom_freqpoly()
+  geom_freqpoly(size = 2) +
+  scale_color_viridis(discrete = TRUE)
 ```
 
 ```{r}
 df %>% 
-  ggplot(aes(speed_limit)) +
-  geom_freqpoly()
+  count(speed_limit) %>% 
+  ggplot(aes(speed_limit, n)) +
+  geom_col()
 ```
 
 ```{r}
 df %>%
   count(speed_limit, speeding_related) %>% 
-  ggplot(aes(speed_limit, n, color = as.factor(speeding_related))) +
+  ggplot(aes(speed_limit, n, color = speeding_related)) +
   geom_point()
 ```
 
 ```{r}
-df %>% 
-  ggplot(aes(as.integer(injury_or_fatal))) +
-  geom_histogram()
-```
-
-```{r}
+df$day_of_week %>% 
+  levels()
 df %>%
-  select(contains("fatal", "inj")) -> df_casualties
-
-df_casualties %>% 
-  ggplot(aes(fatal_count)) +
-  geom_freqpoly() +
-  geom_rug()
-
-df_casualties %>% 
-  ggplot(aes(as.logical(injury_or_fatal))) +
-  geom_bar()
-```
-
-```{r}
-colnames(df)
-
-df %>% 
-  select(crash_crn, illumination, weather, road_condition, urban_rural, location_type, rdwy_surf_type_cd, workers_pres, wet_road, snow_slush_road, icy_road, sudden_deer, train, trolley) %>% 
-  gather(key = environmental_factor, value = environmental_measurement, -crash_crn) -> df_environmental_factors
-```
-
-```{r}
-df_environmental_factors %>% 
-  count(environmental_factor, environmental_measurement) %>% 
-  ggplot(aes(x = environmental_measurement, y = n)) +
-  geom_col() +
-  facet_wrap(~environmental_factor,
-             scale = "free",
-             ncol = 3)
-```
-
-```{r}
-colnames(df)
-
-df %>% 
-  select(crash_crn, total_units, person_count, vehicle_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, fatal_count, injury_count, maj_inj_count, mod_inj_count, min_inj_count, unk_inj_deg_count, unk_inj_per_count, unbelted_occ_count, unb_death_count, unb_maj_inj_count, belted_death_count, belted_maj_inj_count, mcycle_death_count, mcycle_maj_inj_count, bicycle_death_count, bicycle_maj_inj_count, ped_count, ped_death_count, ped_maj_inj_count, comm_veh_count) %>% 
-  gather(accident_metadata, measurement, -crash_crn) ->  df_accident_metadata
-```
-
-```{r}
-df_accident_metadata %>% 
-  count(accident_metadata, measurement) %>% 
-  ggplot(aes(x = measurement, y = n)) +
-  geom_col() +
-  #geom_density() +
-  facet_wrap(~accident_metadata,
-             scales = "free",
-             ncol = 4)
-```
-
-
-```{r}
-map_pgh <- get_map("Pittsburgh, PA",
-                   zoom = 11,
-                   maptype = "toner",
-                   source = "stamen")
-
-map_pgh <- ggmap(map_pgh)
-```
-
-```{r}
-map_pgh
-```
-
-```{r}
-df %>% 
-  select(dec_lat, dec_long, hour_of_day, day_of_week) %>% 
-  filter(!is.na(hour_of_day),
-         hour_of_day < 24) %>% 
-  #count(hour_of_day, dec_lat, dec_long) %>% 
-  filter(!is.na(dec_lat),
-         !is.na(dec_long)) -> df_map
-```
-
-```{r}
-map_pgh +
-  stat_density_2d(data = df_map, 
-                  aes(dec_long, dec_lat,
-                      fill = ..level..),
-                  geom = "polygon",
-                  alpha = .5) +
+  mutate(day_of_week = fct_rev(day_of_week)) %>% 
+  filter(hour_of_day < 24) %>% 
+  group_by(day_of_week, hour_of_day) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>% 
+  ggplot(aes(hour_of_day, day_of_week, fill = fatalities_per_person)) +
+  geom_tile() +
+  coord_equal() +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0)) +
   scale_fill_viridis()
 ```
 
 ```{r}
-map_pgh +
-  stat_density_2d(data = df_map, 
-                  aes(dec_long, dec_lat,
-                      fill = ..level..),
-                  geom = "polygon",
-                  alpha = .5) +
+df %>%
+  complete(road_condition, weather) %>% 
+  group_by(road_condition, weather) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>% 
+
+  ggplot(aes(road_condition, weather, fill = fatalities_per_person, alpha = person_sum)) +
+  geom_tile() +
+  coord_equal() +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_x_discrete(expand = c(0,0)) +
   scale_fill_viridis() +
-  facet_wrap(~hour_of_day) +
-  theme_void()
+  theme(panel.grid = element_blank())
 ```
 
-```{r}
-map_pgh +
-  stat_density_2d(data = df_map, 
-                  aes(dec_long, dec_lat,
-                      fill = ..level..),
-                  geom = "polygon",
-                  alpha = .5) +
-  scale_fill_viridis() +
-  facet_wrap(~day_of_week) +
-  theme_void()
-```
 
 ```{r}
 df %>% 
-  mutate(casualties = fatal_count + injury_count,
-         icy_road = as.logical(icy_road),
-         speeding_related = as.logical(speeding_related),
-         rear_end = as.logical(rear_end)) %>% 
-  select(casualties, speeding_related, speed_limit, day_of_week, hour_of_day, icy_road, rear_end, dec_lat, dec_long) %>% 
-  filter(casualties > 1) -> df_casualties_map
-
-map_pgh +
-  stat_density_2d(data = df_casualties_map, 
-                  aes(dec_long, dec_lat,
-                      fill = ..level..),
-                  geom = "polygon",
-                  alpha = .5) +
-  #geom_point(data = df_casualties_map, aes(dec_long, dec_lat, size = log10(casualties), alpha = .001), color = "red") +
-  scale_fill_viridis() +
-  theme_void()
+  group_by(weather) %>% 
+  summarize(person_sum = log10(sum(person_count, na.rm = TRUE)),
+            fatal_sum = log10(sum(fatal_count, na.rm = TRUE)),
+            fatalities_per_person = fatal_sum / person_sum) %>% 
+  ggplot(aes(person_sum, fatal_sum, label = weather)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(limits = c(0, 6)) +
+  scale_y_continuous(limits = c(0, 6))
+```
+```{r}
+df %>% 
+  group_by(illumination) %>% 
+  summarize(person_sum = log10(sum(person_count, na.rm = TRUE)),
+            fatal_sum = log10(sum(fatal_count, na.rm = TRUE)),
+            fatalities_per_person = fatal_sum / person_sum) %>% 
+  ggplot(aes(person_sum, fatal_sum, label = illumination)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(limits = c(0, 6)) +
+  scale_y_continuous(limits = c(0, 6))
+```
+```{r}
+df %>% 
+  group_by(road_condition) %>% 
+  summarize(person_sum = log10(sum(person_count, na.rm = TRUE)),
+            fatal_sum = log10(sum(fatal_count, na.rm = TRUE)),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = road_condition)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(limits = c(0, 6)) +
+  scale_y_continuous(limits = c(0, 6))
 ```
