@@ -1,0 +1,129 @@
+---
+title: "mapping"
+author: "Conor Tompkins"
+date: "4/21/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE)
+
+getwd()
+```
+
+```{r}
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(lubridate)
+library(viridis)
+library(ggmap)
+library(broom)
+library(gganimate)
+
+theme_set(theme_bw(base_size = 18))
+
+options(scipen = 999, digits = 4)
+```
+
+
+
+```{r}
+source("scripts/02_factorize_columns.R")
+source("scripts/03_clean_data.R")
+
+df <- data
+rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
+```
+
+
+```{r}
+map_pgh <- get_map("Pittsburgh, PA",
+                   zoom = 10,
+                   maptype = "toner",
+                   source = "stamen")
+
+map_pgh <- ggmap(map_pgh)
+```
+
+```{r}
+map_pgh
+```
+
+```{r}
+df %>% 
+  select(dec_lat, dec_long, hour_of_day, day_of_week) %>% 
+  filter(!is.na(hour_of_day),
+         hour_of_day < 24) %>% 
+  #count(hour_of_day, dec_lat, dec_long) %>% 
+  filter(!is.na(dec_lat),
+         !is.na(dec_long)) -> df_map
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  theme_void()
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  facet_wrap(~hour_of_day) +
+  theme_void()
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  facet_wrap(~day_of_week) +
+  theme_void()
+```
+
+```{r}
+df %>% 
+  select(dec_lat, dec_long, road_owner) %>% 
+  #filter(!is.na(road_owner)) %>% 
+  #count(hour_of_day, dec_lat, dec_long) %>% 
+  filter(!is.na(dec_lat),
+         !is.na(dec_long)) -> df_map_road_owner
+
+map_pgh +
+  stat_density_2d(data = df_map_road_owner, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  theme_void() +
+  facet_wrap(~road_owner)
+```
+
+```{r}
+map_pgh +
+  stat_density_2d(data = df_map, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..,
+                      frame = day_of_week),
+                  geom = "polygon",
+                  alpha = .5) +
+  scale_fill_viridis() +
+  theme_void() -> p
+gg_animate(p)
+```
