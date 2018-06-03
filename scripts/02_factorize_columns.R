@@ -1,4 +1,7 @@
-#df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv", #col_types = cols(.default = "c"), progress = FALSE)
+library(tidyverse)
+library(lubridate)
+
+df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv", col_types = cols(.default = "c"), progress = FALSE)
 
 df_dictionary <- read_csv("data/df_dictionary_rebuilt.csv") %>% 
   filter(!is.na(code))
@@ -126,6 +129,13 @@ df_combined_allegheny_county_crash_data_2004_2017_raw %>%
 levels(df_combined_allegheny_county_crash_data_2004_2017_raw$tcd_func_cd)
 
 df_combined_allegheny_county_crash_data_2004_2017_raw %>% 
+  mutate(tcd_type = as.character(as.integer(tcd_type))) %>% 
+  left_join(df_dictionary %>% filter(column_name == "tcd_type") %>% select(code, readable), c("tcd_type" = "code")) %>% 
+  mutate(tcd_type = as.factor(readable)) %>% 
+  select(-readable) -> df_combined_allegheny_county_crash_data_2004_2017_raw
+levels(df_combined_allegheny_county_crash_data_2004_2017_raw$tcd_type)
+
+df_combined_allegheny_county_crash_data_2004_2017_raw %>% 
   mutate(urban_rural = as.character(urban_rural)) %>% 
   left_join(df_dictionary %>% filter(column_name == "urban_rural") %>% select(code, readable), c("urban_rural" = "code")) %>% 
   mutate(urban_rural = as.factor(readable)) %>% 
@@ -153,4 +163,6 @@ df_combined_allegheny_county_crash_data_2004_2017_raw %>%
   select(-readable) -> df_combined_allegheny_county_crash_data_2004_2017_raw
 levels(df_combined_allegheny_county_crash_data_2004_2017_raw$work_zone_type)
 
-write_csv(df_combined_allegheny_county_crash_data_2004_2017_raw, "data/df_combined_allegheny_county_crash_data_2004_2017_factorized.csv")
+df_combined_allegheny_county_crash_data_2004_2017_factorized <- df_combined_allegheny_county_crash_data_2004_2017_raw
+
+#write_csv(df_combined_allegheny_county_crash_data_2004_2017_raw, "data/df_combined_allegheny_county_crash_data_2004_2017_factorized.csv")
