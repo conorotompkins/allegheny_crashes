@@ -6,10 +6,11 @@ df_combined_allegheny_county_crash_data_2004_2017_factorized <- read_csv("data/d
 glimpse(df_combined_allegheny_county_crash_data_2004_2017_factorized)
 
 
-df_combined_allegheny_county_crash_data_2004_2017_factorized %>% 
-  mutate(crash_year = as.integer(as.double(crash_year)),
+df_combined_allegheny_county_crash_data_2004_2017_raw %>% 
+  mutate(crash_year = as.integer(crash_year),
          crash_month = month(as.integer(crash_month), label = TRUE),
-         day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
+         day_of_week_old = day_of_week,
+         #day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
          time_of_day = as.integer(time_of_day),
          hour_of_day = as.integer(hour_of_day)) %>% 
   mutate_at(vars(contains("count")), as.integer) %>% 

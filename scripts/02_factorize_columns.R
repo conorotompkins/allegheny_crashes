@@ -1,4 +1,4 @@
-#df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv")
+#df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv", #col_types = cols(.default = "c"), progress = FALSE)
 
 df_dictionary <- read_csv("data/df_dictionary_rebuilt.csv") %>% 
   filter(!is.na(code))
@@ -18,10 +18,15 @@ df_combined_allegheny_county_crash_data_2004_2017_raw %>%
 levels(df_combined_allegheny_county_crash_data_2004_2017_raw$crash_county)
 
 df_combined_allegheny_county_crash_data_2004_2017_raw %>% 
-  mutate(day_of_week = as.character(day_of_week)) %>% 
+  mutate(day_of_week_old = day_of_week,
+         day_of_week = as.integer(day_of_week),
+         day_of_week = as.character(day_of_week)) %>% 
   left_join(df_dictionary %>% filter(column_name == "day_of_week") %>% select(code, readable), c("day_of_week" = "code")) %>% 
   mutate(day_of_week = as.character(readable)) %>% 
-  select(-readable) -> df_combined_allegheny_county_crash_data_2004_2017_raw
+  select(-readable) %>% 
+  select(crash_crn, district, crash_county, municipality, police_agcy, crash_year, crash_month, day_of_week, day_of_week_old, everything()) -> df_combined_allegheny_county_crash_data_2004_2017_raw
+unique(df_combined_allegheny_county_crash_data_2004_2017_raw$day_of_week)
+unique(df_combined_allegheny_county_crash_data_2004_2017_raw$day_of_week_old)
 
 df_combined_allegheny_county_crash_data_2004_2017_raw %>% 
   mutate(district = as.character(district)) %>% 
