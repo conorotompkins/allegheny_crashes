@@ -8,6 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE)
+
+getwd()
 ```
 
 ```{r}
@@ -27,16 +29,10 @@ options(scipen = 999, digits = 4)
 
 
 ```{r}
-read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/all-crashes2004-2016.csv") %>% 
-  clean_names() %>% 
-  mutate(crash_month = month(as.integer(crash_month), label = TRUE),
-         day_of_week = wday(as.integer(day_of_week), label = TRUE),
-         day_of_week = fct_shift(day_of_week, n = 1),
-         time_of_day = as.integer(time_of_day),
-         hour_of_day = as.integer(hour_of_day)) -> df
-```
-```{r}
-preview <- skim(df)
+source("scripts/03_clean_data.R")
+
+df <- data
+rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 ```
 
 ```{r}
