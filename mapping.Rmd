@@ -22,7 +22,7 @@ library(ggmap)
 library(broom)
 library(gganimate)
 
-theme_set(theme_bw(base_size = 18))
+theme_set(theme_bw(base_size = 20))
 
 options(scipen = 999, digits = 4)
 ```
@@ -116,14 +116,37 @@ map_pgh +
 ```
 
 ```{r}
-map_pgh +
+map_pgh_ani <- get_map("Pittsburgh, PA",
+                   zoom = 12,
+                   maptype = "toner",
+                   source = "stamen")
+
+map_pgh_ani <- ggmap(map_pgh_ani)
+
+#map_pgh_ani +
+#  stat_density_2d(data = df_map, 
+#                  aes(dec_long, dec_lat,
+#                      fill = ..level..),
+#                  geom = "polygon",
+#                  alpha = .3) +
+#  facet_wrap(~hour_of_day) +
+#  scale_fill_viridis() +
+#  labs(title = "Hour:",
+#       subtitle = "Crashes in Allegheny County 2014-2017")
+
+map_pgh_ani +
   stat_density_2d(data = df_map, 
                   aes(dec_long, dec_lat,
                       fill = ..level..,
-                      frame = day_of_week),
+                      frame = as.factor(hour_of_day)),
                   geom = "polygon",
-                  alpha = .5) +
+                  alpha = .3) +
+  facet_wrap(~day_of_week, nrow = 1) +
   scale_fill_viridis() +
+  labs(title = "Hour:",
+       subtitle = "Crashes in Allegheny County 2014-2017") +
   theme_void() -> p
-gg_animate(p)
+gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000)
+
+#gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000, "output.gif")
 ```
