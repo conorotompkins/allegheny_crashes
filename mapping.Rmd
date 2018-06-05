@@ -134,19 +134,25 @@ map_pgh_ani <- ggmap(map_pgh_ani)
 #  labs(title = "Hour:",
 #       subtitle = "Crashes in Allegheny County 2014-2017")
 
-map_pgh_ani +
-  stat_density_2d(data = df_map, 
+df_map %>% 
+  mutate(day_type = case_when(day_of_week %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") ~ "Weekday",
+                              day_of_week %in% c("Saturday", "Sunday") ~ "Weekend")) %>% 
+  select(-day_of_week) -> df_map_day_type
+
+
+map_pgh +
+  stat_density_2d(data = df_map_day_type, 
                   aes(dec_long, dec_lat,
                       fill = ..level..,
                       frame = as.factor(hour_of_day)),
                   geom = "polygon",
                   alpha = .3) +
-  facet_wrap(~day_of_week, nrow = 1) +
-  scale_fill_viridis() +
+  facet_wrap(~day_type, nrow = 1) +
+  scale_fill_viridis("Number of crashes") +
   labs(title = "Hour:",
        subtitle = "Crashes in Allegheny County 2014-2017") +
   theme_void() -> p
 gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000)
 
-#gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000, "output.gif")
+gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000, "output.gif")
 ```
