@@ -20,6 +20,8 @@ library(lubridate)
 library(viridis)
 library(ggmap)
 library(broom)
+library(ggraph)
+library(igraph)
 
 theme_set(theme_bw(base_size = 18))
 
@@ -170,36 +172,63 @@ df %>%
 ```{r}
 df %>% 
   group_by(weather) %>% 
-  summarize(person_sum = log10(sum(person_count, na.rm = TRUE)),
-            fatal_sum = log10(sum(fatal_count, na.rm = TRUE)),
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
             fatalities_per_person = fatal_sum / person_sum) %>% 
   ggplot(aes(person_sum, fatal_sum, label = weather)) +
   geom_label() +
-  geom_smooth(method = "lm", se = FALSE) +
-  scale_x_continuous(limits = c(0, 6)) +
-  scale_y_continuous(limits = c(0, 6))
+  geom_smooth(method = "lm", se = FALSE)
+  #scale_x_continuous(limits = c(0, 6)) +
+  #scale_y_continuous(limits = c(0, 6))
 ```
 ```{r}
 df %>% 
   group_by(illumination) %>% 
-  summarize(person_sum = log10(sum(person_count, na.rm = TRUE)),
-            fatal_sum = log10(sum(fatal_count, na.rm = TRUE)),
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
             fatalities_per_person = fatal_sum / person_sum) %>% 
   ggplot(aes(person_sum, fatal_sum, label = illumination)) +
   geom_label() +
-  geom_smooth(method = "lm", se = FALSE) +
-  scale_x_continuous(limits = c(0, 6)) +
-  scale_y_continuous(limits = c(0, 6))
+  geom_smooth(method = "lm", se = FALSE)
+  #scale_x_continuous(limits = c(0, 6)) +
+  #scale_y_continuous(limits = c(0, 6))
 ```
 ```{r}
 df %>% 
   group_by(road_condition) %>% 
-  summarize(person_sum = log10(sum(person_count, na.rm = TRUE)),
-            fatal_sum = log10(sum(fatal_count, na.rm = TRUE)),
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
             fatalities_per_person = fatal_sum / person_sum) %>%
   ggplot(aes(person_sum, fatal_sum, label = road_condition)) +
   geom_label() +
-  geom_smooth(method = "lm", se = FALSE) +
-  scale_x_continuous(limits = c(0, 6)) +
-  scale_y_continuous(limits = c(0, 6))
+  geom_smooth(method = "lm", se = FALSE)
+  #scale_x_continuous(limits = c(0, 6)) +
+  #scale_y_continuous(limits = c(0, 6))
+```
+
+```{r}
+df %>% 
+  group_by(road_owner) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = road_owner)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE)
+  #scale_x_continuous(limits = c(0, 6)) +
+  #scale_y_continuous(limits = c(0, 6),expand = c(1,1))
+```
+
+#working on networking
+```{r}
+df %>% 
+  select(weather, road_condition) %>%
+  mutate_all(as.character) %>% 
+  count(weather, road_condition) %>% 
+  replace_na(list(weather = "Missing", road_condition = "Missing")) %>% 
+  graph_from_data_frame() %>% 
+  ggraph() + 
+    geom_edge_link() + 
+    geom_node_label(aes(label = ))
+  
 ```
