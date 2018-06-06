@@ -22,6 +22,7 @@ library(ggmap)
 library(broom)
 library(ggraph)
 library(igraph)
+library(corrr)
 
 theme_set(theme_bw(base_size = 18))
 
@@ -178,8 +179,6 @@ df %>%
   ggplot(aes(person_sum, fatal_sum, label = weather)) +
   geom_label() +
   geom_smooth(method = "lm", se = FALSE)
-  #scale_x_continuous(limits = c(0, 6)) +
-  #scale_y_continuous(limits = c(0, 6))
 ```
 ```{r}
 df %>% 
@@ -190,8 +189,6 @@ df %>%
   ggplot(aes(person_sum, fatal_sum, label = illumination)) +
   geom_label() +
   geom_smooth(method = "lm", se = FALSE)
-  #scale_x_continuous(limits = c(0, 6)) +
-  #scale_y_continuous(limits = c(0, 6))
 ```
 ```{r}
 df %>% 
@@ -202,8 +199,6 @@ df %>%
   ggplot(aes(person_sum, fatal_sum, label = road_condition)) +
   geom_label() +
   geom_smooth(method = "lm", se = FALSE)
-  #scale_x_continuous(limits = c(0, 6)) +
-  #scale_y_continuous(limits = c(0, 6))
 ```
 
 ```{r}
@@ -215,20 +210,119 @@ df %>%
   ggplot(aes(person_sum, fatal_sum, label = road_owner)) +
   geom_label() +
   geom_smooth(method = "lm", se = FALSE)
-  #scale_x_continuous(limits = c(0, 6)) +
-  #scale_y_continuous(limits = c(0, 6),expand = c(1,1))
 ```
+
+```{r}
+df %>% 
+  group_by(relation_to_road) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = relation_to_road)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+df %>% 
+  group_by(tcd_type) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = tcd_type)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+df %>% 
+  group_by(collision_type) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = collision_type)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+df %>% 
+  group_by(location_type) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = location_type)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+df %>% 
+  select(illumination, weather, road_condition, road_owner, collision_type, relation_to_road, intersect_type, tcd_type, tcd_func_cd, location_type, rdwy_surf_type_cd, rdwy_orient, work_zone_type, work_zone_loc, person_count, fatal_count) %>% 
+  gather(metadata_measure, metadata_value, -c(person_count, fatal_count)) %>% 
+  group_by(metadata_measure, metadata_value) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = metadata_value)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~metadata_measure)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #working on networking
 ```{r}
+set.seed(1234)
+
 df %>% 
   select(weather, road_condition) %>%
   mutate_all(as.character) %>% 
   count(weather, road_condition) %>% 
   replace_na(list(weather = "Missing", road_condition = "Missing")) %>% 
-  graph_from_data_frame() %>% 
+  arrange(desc(n)) %>% 
+  graph_from_data_frame(directed = FALSE) %>% 
   ggraph() + 
-    geom_edge_link() + 
-    geom_node_label(aes(label = ))
+    geom_edge_link(aes(edge_alpha = n)) + 
+    geom_node_label(aes(label = name)) +
+  theme_bw()
+
+df %>% 
+  select(crash_year, crash_month, day_of_week, hour_of_day, weather, road_condition) %>%
+  mutate_all(as.character) %>% 
+  count(crash_year, crash_month, day_of_week, hour_of_day, weather, road_condition) %>% 
+  replace_na(list(weather = "Missing", road_condition = "Missing")) %>% 
+  gather(environmental_measure, value, -c(crash_year, crash_month, day_of_week, hour_of_day, n)) %>% 
+  mutate(value = str_c(environmental_measure, value, sep = "-")) %>% 
+  group_by(crash_year, crash_month, day_of_week, hour_of_day, value) %>% 
+  summarize(n = sum(n)) %>% 
+  spread(value, n) %>% 
+  ungroup() %>% 
+  select(-c(crash_year, crash_month, day_of_week, hour_of_day)) %>% 
+  correlate() %>% 
+  stretch() %>%
+  filter(!is.na(r),
+         abs(r) > .3) -> df_graph
+
+df_graph %>% 
+  graph_from_data_frame(directed = FALSE) %>% 
+  ggraph() + 
+    geom_edge_link(aes(edge_width = abs(r), color = r)) + 
+    #scale_edge_color_viridis()
+    geom_node_label(aes(label = name)) +
+    scale_edge_width_continuous(range = c(.1, 2)) +
+    scale_edge_alpha(range = c(.1, 1))
   
 ```
