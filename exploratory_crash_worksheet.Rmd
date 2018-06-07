@@ -169,93 +169,6 @@ df %>%
   theme(panel.grid = element_blank())
 ```
 
-
-```{r}
-df %>% 
-  group_by(weather) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>% 
-  ggplot(aes(person_sum, fatal_sum, label = weather)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-```{r}
-df %>% 
-  group_by(illumination) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>% 
-  ggplot(aes(person_sum, fatal_sum, label = illumination)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-```{r}
-df %>% 
-  group_by(road_condition) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
-  ggplot(aes(person_sum, fatal_sum, label = road_condition)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
-```{r}
-df %>% 
-  group_by(road_owner) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
-  ggplot(aes(person_sum, fatal_sum, label = road_owner)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
-```{r}
-df %>% 
-  group_by(relation_to_road) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
-  ggplot(aes(person_sum, fatal_sum, label = relation_to_road)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
-```{r}
-df %>% 
-  group_by(tcd_type) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
-  ggplot(aes(person_sum, fatal_sum, label = tcd_type)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
-```{r}
-df %>% 
-  group_by(collision_type) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
-  ggplot(aes(person_sum, fatal_sum, label = collision_type)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
-```{r}
-df %>% 
-  group_by(location_type) %>% 
-  summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
-  ggplot(aes(person_sum, fatal_sum, label = location_type)) +
-  geom_label() +
-  geom_smooth(method = "lm", se = FALSE)
-```
-
 ```{r}
 df %>% 
   select(illumination, weather, road_condition, road_owner, collision_type, relation_to_road, intersect_type, tcd_type, tcd_func_cd, location_type, rdwy_surf_type_cd, rdwy_orient, work_zone_type, work_zone_loc, person_count, fatal_count) %>% 
@@ -270,15 +183,92 @@ df %>%
   facet_wrap(~metadata_measure)
 ```
 
+```{r}
+df %>% 
+  count(crash_year, crash_month) %>% 
+  arrange(crash_year, crash_month) %>%
+  mutate(crash_year = fct_inorder(as.character(crash_year)),
+        time_period = str_c(crash_year, crash_month, sep = "-"),
+         time_period = fct_inorder(time_period)) %>%
+  group_by(crash_year) %>% 
+  mutate(n_cumulative = cumsum(n)) %>% 
+  ggplot(aes(crash_month, n_cumulative, color = crash_year, group = crash_year)) +
+  geom_line(size = 2) +
+  scale_color_viridis(discrete = TRUE) +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  select(crash_year, crash_month, person_count) %>% 
+  arrange(crash_year, crash_month) %>%
+  mutate(crash_year = fct_inorder(as.character(crash_year)),
+         time_period = str_c(crash_year, crash_month, sep = "-"),
+         time_period = fct_inorder(time_period)) %>%
+  group_by(crash_year, crash_month) %>% 
+  summarize(person_count = sum(person_count)) %>% 
+  #group_by(crash_year, crash_month) %>% 
+  mutate(person_count_cumulative = cumsum(person_count)) %>% 
+  ggplot(aes(crash_month, person_count_cumulative, color = crash_year, group = crash_year)) +
+  geom_line(size = 2) +
+  scale_color_viridis(discrete = TRUE) +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  select(crash_year, crash_month, fatal_count) %>% 
+  arrange(crash_year, crash_month) %>%
+  mutate(crash_year = fct_inorder(as.character(crash_year)),
+         time_period = str_c(crash_year, crash_month, sep = "-"),
+         time_period = fct_inorder(time_period)) %>%
+  group_by(crash_year, crash_month) %>% 
+  summarize(fatal_count = sum(fatal_count)) %>% 
+  #group_by(crash_year, crash_month) %>% 
+  mutate(person_count_cumulative = cumsum(fatal_count)) %>% 
+  ggplot(aes(crash_month, person_count_cumulative, color = crash_year, group = crash_year)) +
+  geom_line(size = 2) +
+  scale_color_viridis(discrete = TRUE) +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  select(crash_year, crash_month, person_count, fatal_count, injury_count, unb_death_count, belted_death_count, bicycle_maj_inj_count, ped_maj_inj_count, ped_death_count, bicycle_maj_inj_count, bicycle_death_count) %>% 
+  arrange(crash_year, crash_month) %>%
+  mutate(crash_year = fct_inorder(as.character(crash_year)),
+         time_period = str_c(crash_year, crash_month, sep = "-"),
+         time_period = fct_inorder(time_period)) %>%
+  gather(measure, n, -c(crash_year, crash_month, time_period)) %>% 
+  group_by(time_period, crash_year, crash_month, measure) %>% 
+  summarize(n = sum(n)) %>% 
+  arrange(measure, time_period) %>% 
+  group_by(measure) %>% 
+  mutate(n_cumulative = cumsum(n)) -> df_cumulative
+
+df_cumulative %>% 
+  ggplot(aes(time_period, n_cumulative, group = measure, color = measure)) +
+  geom_line(size = 1) +
+  facet_wrap(~measure,
+             scales = "free_y") +
+  scale_color_viridis(discrete = TRUE) +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_blank())
+```
+
+#proportion of crashes with different driver ages
+```{r}
 
 
 
+```
+
+#gather() all other logical metadata columns such as turnpike, wet_road_snow_slush_road, make cumulative charts
+```{r}
 
 
 
-
-
-
+```
 
 
 
@@ -325,4 +315,23 @@ df_graph %>%
     scale_edge_width_continuous(range = c(.1, 2)) +
     scale_edge_alpha(range = c(.1, 1))
   
+```
+
+```{r}
+df %>% 
+  select(contains("count")) %>%
+  select(-contains("death"), -c(roadway_county, crash_county, lane_count)) %>% 
+  correlate() %>% 
+  stretch() %>% 
+  filter(!is.na(r),
+    abs(r) > .1)-> df_graph
+
+df_graph %>% 
+  graph_from_data_frame(directed = FALSE) %>% 
+  ggraph() + 
+    geom_edge_link(aes(edge_width = abs(r), color = r)) + 
+    #scale_edge_color_viridis(discrete = FALSE) +
+    geom_node_label(aes(label = name)) +
+    scale_edge_width_continuous(range = c(.01, 2)) +
+    scale_edge_alpha(range = c(.01, 1))
 ```
