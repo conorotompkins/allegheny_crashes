@@ -7,7 +7,8 @@ glimpse(df_combined_allegheny_county_crash_data_2004_2017_factorized)
 
 
 df_combined_allegheny_county_crash_data_2004_2017_factorized %>% 
-  mutate(crash_year = as.integer(crash_year),
+  mutate(fatal = as.integer(str_sub(fatal, 1)),
+    crash_year = as.integer(crash_year),
          crash_month = month(as.integer(crash_month), label = TRUE),
          day_of_week_old = day_of_week,
          day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
@@ -56,6 +57,8 @@ df_combined_allegheny_county_crash_data_2004_2017_factorized %>%
   mutate_at(vars(interstate:trolley), as.logical) -> data
 
 glimpse(data)
+
+
 
 #data %>% 
 #  filter(crash_year == 2015) %>% 
