@@ -13,6 +13,7 @@ output: html_document
 ***xhour = sin(2pi * hour_of_day/24), yhour = cos(2pi * hour_of_day/24)
 
 
+###SCREWED UP RIGHT NOW, WIP
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = TRUE)
@@ -39,51 +40,12 @@ options(scipen = 999, digits = 4)
 ```
 
 ```{r}
-#knitr::opts_knit$set(root.dir = "scripts/modeling")
-#setwd("C:/Users/conor/githubfolder/allegheny_crashes/scripts/modeling")
-#getwd()
-#list.files(getwd())
-data <- read_csv("df_2013_cleaned.csv")
+source("scripts/02_factorize_columns.R")
+source("scripts/03_clean_data.R")
 
-data %>% 
-  mutate(crash_year = as.integer(as.double(crash_year)),
-         crash_month = month(as.integer(crash_month), label = TRUE),
-         day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")),
-         time_of_day = as.integer(time_of_day),
-         hour_of_day = as.integer(hour_of_day)) %>% 
-  mutate_at(vars(contains("count")), as.integer) %>% 
-  mutate_at(vars(contains("units")), as.integer) %>% 
-  mutate(sch_bus_ind = case_when(sch_bus_ind == "N" ~ FALSE,
-                                 sch_bus_ind == "Y" ~ TRUE),
-         sch_zone_ind = case_when(sch_zone_ind == "N" ~ FALSE,
-                                  sch_zone_ind == "Y" ~ TRUE),
-         tfc_detour_ind = factor(tfc_detour_ind, levels = c("Y", "N", "U")),
-         work_zone_ind = case_when(work_zone_ind == "N" ~ FALSE,
-                                   work_zone_ind == "Y" ~ TRUE),
-         wz_law_offcr_ind = factor(wz_law_offcr_ind, levels = c("Y", "N", "U")),
-         ntfy_hiwy_maint = case_when(ntfy_hiwy_maint == "N" ~ FALSE,
-                                     ntfy_hiwy_maint == "Y" ~ TRUE)) %>% 
-  mutate(automobile = case_when(automobile_count >= 1 ~ TRUE,
-                                automobile_count < 1 ~ FALSE),
-         bus = case_when(bus_count >= 1 ~ TRUE,
-                         bus_count < 1 ~ FALSE),
-         small_truck = case_when(small_truck_count >= 1 ~ TRUE,
-                                       small_truck_count < 1 ~ FALSE),
-         heavy_truck = case_when(heavy_truck_count >= 1 ~ TRUE,
-                                 heavy_truck_count < 1 ~ FALSE),
-         suv = case_when(suv_count >= 1 ~ TRUE, 
-                         suv_count < 1 ~ FALSE),
-         van = case_when(van_count >= 1 ~ TRUE,
-                         van_count < 1 ~ FALSE),
-         motorcycle = case_when(motorcycle_count >= 1 ~ TRUE,
-                                motorcycle_count < 1 ~ FALSE),
-         bicycle = case_when(bicycle_count >= 1 ~ TRUE,
-                             bicycle_count < 1 ~ FALSE),
-         pedestrian = case_when(ped_count >= 1 ~ TRUE,
-                                ped_count < 1 ~ FALSE),
-         fatal = as.integer(fatal),
-         fatal = factor(as.logical(fatal))) %>% 
-  filter(hour_of_day <= 23) -> df
+df <- data %>% 
+  filter(hour_of_day < 24)
+rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 ```
 
 
@@ -101,12 +63,9 @@ df %>%
 colnames(df)
 
 df %>% 
-  select(fatal, crash_year, day_of_week, hour_of_day, weather, illumination, road_condition, collision_type, relation_to_road, urban_rural, speed_limit, person_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, ped_count, speeding, cell_phone, alcohol_related, drinking_driver, aggressive_driving, fatigue_asleep, running_red_lt, running_stop_sign, tailgating, cross_median, impaired_driver)  %>% 
-  mutate_at(vars(speeding:impaired_driver), as.integer) %>% 
-  mutate_at(vars(speeding:impaired_driver), as.logical) %>% 
-  mutate_if(is.character, as.factor) %>% 
-  mutate_if(is.logical, as.factor) %>% 
-  mutate(crash_year = crash_year -  2004) %>% 
+  select(fatal, crash_year, day_of_week, hour_of_day, weather, illumination, road_condition, collision_type, relation_to_road, intersect_type, tcd_type, location_type, rdwy_surf_type_cd, speed_limit, person_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, ped_count)  %>% 
+  mutate(crash_year = crash_year -  2004,
+         fatal = as.factor(fatal)) %>% 
   na.omit() -> df_model_1
 ```
 
@@ -132,39 +91,29 @@ crash_rf$prediction.error
 #model_1
 ```{r}
 df_model_1 %>% 
-  mutate(.pred = predictions(crash_rf)) -> df_model_1
+  mutate(.pred = predictions(crash_rf)) -> df_model_1_output
 ```
 
 ```{r}
 df_model_1 %>% 
-  count(fatal, pred, sort = TRUE) %>% 
-  ggplot(aes(fatal, pred, fill = n)) +
-  geom_tile() +
+  count(fatal, .pred, sort = TRUE) %>% 
+  ggplot(aes(fatal, .pred, fill = n)) +
+  geom_tile(color = "grey") +
   scale_fill_viridis()
 ```
 
 ```{r}
-df %>% 
-  select(fatal, crash_year, day_of_week, hour_of_day, weather, illumination, road_condition, collision_type, relation_to_road, urban_rural, speed_limit, person_count, automobile_count, motorcycle_count, bus_count, small_truck_count, heavy_truck_count, suv_count, van_count, bicycle_count, ped_count, speeding, cell_phone, alcohol_related, drinking_driver, aggressive_driving, fatigue_asleep, running_red_lt, running_stop_sign, tailgating, cross_median, impaired_driver)  %>% 
-  mutate_at(vars(speeding:impaired_driver), as.integer) %>% 
-  mutate_at(vars(speeding:impaired_driver), as.logical) %>% 
-  mutate_if(is.character, as.factor) %>% 
-  mutate_if(is.logical, as.factor) %>% 
-  mutate(crash_year = crash_year -  2004) %>% 
-  na.omit() -> df_model_1
-
-
-model_1 <- rpart(fatal ~ ., data = df_model_1)
-model_1_output <- as_tibble(predict(model_1, newdata = df_model_1))
-df_model_1 %>% 
-  bind_cols(model_1_output) %>% 
+model_2 <- rpart(fatal ~ ., data = df_model_1)
+model_2_output <- as_tibble(predict(model_2, newdata = df_model_1))
+df_model_2 %>% 
+  bind_cols(model_2_output) %>% 
   rename(pred_non_fatal = `FALSE`,
          pred_fatal = `TRUE`) %>% 
-  select(fatal, pred_fatal, pred_non_fatal, everything()) -> df_model_1
-df_model_1
-prp(model_1)
-tidy(model_1)
-summary(model_1)
+  select(fatal, pred_fatal, pred_non_fatal, everything()) -> df_model_2
+df_model_2
+rpart.plot(model_2)
+tidy(model_2)
+summary(model_2)
 ```
 #model_2
 ```{r}
