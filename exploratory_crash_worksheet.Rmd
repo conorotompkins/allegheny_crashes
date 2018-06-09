@@ -39,6 +39,9 @@ df <- data
 rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 
 df %>% 
+  count(fatal)
+
+df %>% 
   filter(crash_year == 2015) %>% 
   count(crash_year, crash_month, day_of_week, day_of_week_old) -> test
 ```
@@ -207,7 +210,6 @@ df %>%
          time_period = fct_inorder(time_period)) %>%
   group_by(crash_year, crash_month) %>% 
   summarize(person_count = sum(person_count)) %>% 
-  #group_by(crash_year, crash_month) %>% 
   mutate(person_count_cumulative = cumsum(person_count)) %>% 
   ggplot(aes(crash_month, person_count_cumulative, color = crash_year, group = crash_year)) +
   geom_line(size = 2) +
@@ -224,7 +226,6 @@ df %>%
          time_period = fct_inorder(time_period)) %>%
   group_by(crash_year, crash_month) %>% 
   summarize(fatal_count = sum(fatal_count)) %>% 
-  #group_by(crash_year, crash_month) %>% 
   mutate(person_count_cumulative = cumsum(fatal_count)) %>% 
   ggplot(aes(crash_month, person_count_cumulative, color = crash_year, group = crash_year)) +
   geom_line(size = 2) +
@@ -234,12 +235,15 @@ df %>%
 
 ```{r}
 df %>% 
-  select(crash_year, crash_month, person_count, fatal_count, injury_count, unb_death_count, belted_death_count, bicycle_maj_inj_count, ped_maj_inj_count, ped_death_count, bicycle_maj_inj_count, bicycle_death_count) %>% 
+  select(crash_year, crash_month, person_count, fatal_count, injury_count, unb_maj_inj_count, unb_death_count, belted_maj_inj_count, belted_death_count, ped_maj_inj_count, ped_death_count, bicycle_maj_inj_count, bicycle_death_count) %>% 
   arrange(crash_year, crash_month) %>%
   mutate(crash_year = fct_inorder(as.character(crash_year)),
          time_period = str_c(crash_year, crash_month, sep = "-"),
          time_period = fct_inorder(time_period)) %>%
-  gather(measure, n, -c(crash_year, crash_month, time_period)) %>% 
+  gather(measure, n, -c(crash_year, crash_month, time_period)) %>%
+  mutate(measure = factor(measure, levels = c("person_count", "injury_count", "fatal_count", "belted_maj_inj_count",
+                                              "belted_death_count", "unb_maj_inj_count", "unb_death_count", 
+                                              "ped_maj_inj_count", "ped_death_count", "bicycle_maj_inj_count", "bicycle_death_count"))) %>% 
   group_by(time_period, crash_year, crash_month, measure) %>% 
   summarize(n = sum(n)) %>% 
   arrange(measure, time_period) %>% 
@@ -247,14 +251,66 @@ df %>%
   mutate(n_cumulative = cumsum(n)) -> df_cumulative
 
 df_cumulative %>% 
-  ggplot(aes(time_period, n_cumulative, group = measure, color = measure)) +
+  ggplot(aes(time_period, n_cumulative, group = 1)) +
   geom_line(size = 1) +
   facet_wrap(~measure,
              scales = "free_y") +
-  scale_color_viridis(discrete = TRUE) +
   theme(panel.grid = element_blank(),
         axis.text.x = element_blank())
 ```
+
+```{r}
+df %>% 
+  select(contains("death")) %>% 
+  gather(death_type, count) %>%
+  group_by(death_type) %>% 
+  summarize(count = sum(count)) %>% 
+  mutate(death_type = fct_reorder(death_type, count)) %>% 
+  arrange(death_type) %>% 
+  select(death_type) %>% 
+  unlist() -> death_type_fct
+  
+
+df %>% 
+  select(contains("death"), crash_year) %>% 
+  gather(death_type, count, -crash_year) %>% 
+  mutate(death_type = factor(death_type, levels = death_type_fct)) %>% 
+  group_by(crash_year, death_type) %>% 
+  summarize(count = sum(count)) %>% 
+  ggplot(aes(crash_year, count, fill = death_type, group = death_type)) +
+  geom_col() +
+  scale_fill_viridis(discrete = TRUE)
+```
+
+```{r}
+df %>% 
+  select(crash_year, contains("inj")) %>% 
+  select(crash_year, contains("count"), -c(injury_count, tot_inj_count)) %>% 
+  gather(inj_type, count, -crash_year) %>% 
+  group_by(inj_type) %>% 
+  summarize(count = sum(count)) %>% 
+  mutate(inj_type = fct_reorder(inj_type, count)) %>% 
+  arrange(inj_type) %>% 
+  select(inj_type) %>% 
+  unlist() -> inj_type_fct
+
+
+
+df %>% 
+  select(crash_year, contains("inj")) %>% 
+  select(crash_year, contains("count"), -c(injury_count, tot_inj_count)) %>% 
+  gather(inj_type, count, -crash_year) %>% 
+  mutate(inj_type = factor(inj_type, levels = inj_type_fct)) %>% 
+  group_by(crash_year, inj_type) %>% 
+  summarize(count = sum(count)) %>% 
+  ggplot(aes(crash_year, count, fill = inj_type, group = inj_type)) +
+  geom_col() +
+  scale_fill_viridis(discrete = TRUE)
+
+```
+
+#proportional bar chart of injuries + deaths for belted vs. unbelted
+
 
 #proportion of crashes with different driver ages
 ```{r}
