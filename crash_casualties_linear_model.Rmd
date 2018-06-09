@@ -34,11 +34,12 @@ options(scipen = 999, digits = 4)
 ```
 
 ```{r}
-source("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/scripts/03_clean_data.R")
+source("scripts/02_factorize_columns.R")
+source("scripts/03_clean_data.R")
 
-df <- df_combined_allegheny_county_crash_data_2004_2017_cleaned
-
-rm(df_combined_allegheny_county_crash_data_2004_2017_cleaned, df_combined_allegheny_county_crash_data_2004_2017_factorized)
+df <- data %>% 
+  filter(hour_of_day < 24)
+rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 ```
 
 ```{r}
@@ -86,7 +87,7 @@ df %>%
 ```{r}
 df %>% 
   mutate(casualties = fatal_count + injury_count) %>% 
-  select(casualties, illumination, road_condition, vehicle_count, collision_type, speed_limit, speeding) -> df_model
+  select(casualties, crash_year, crash_month, day_of_week, hour_of_day, illumination, road_condition, road_owner, rdwy_surf_type_cd, vehicle_count, collision_type, speed_limit, vehicle_count, person_count) -> df_model
 
 df_model %>% 
   ggplot(aes(casualties)) +
@@ -112,7 +113,6 @@ glance(model1)
 
 ```{r}
 df_model %>% 
-  na.omit() %>% 
   add_predictions(model1) %>%
   add_residuals(model1) -> df_results
 ```
@@ -198,6 +198,14 @@ df_results %>%
   select(vehicle_count, casualties, pred) %>% 
   gather(measure, value, -vehicle_count) %>% 
   ggplot(aes(vehicle_count, value, color = measure)) +
+  geom_jitter(alpha = .1) +
+  geom_smooth()
+```
+```{r}
+df_results %>% 
+  select(person_count, casualties, pred) %>% 
+  gather(measure, value, -person_count) %>% 
+  ggplot(aes(person_count, value, color = measure)) +
   geom_jitter(alpha = .1) +
   geom_smooth()
 ```
