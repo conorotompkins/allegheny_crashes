@@ -1,0 +1,159 @@
+---
+title: "exploratory_crash_worksheet_2"
+author: "Conor Tompkins"
+date: "4/21/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE)
+
+getwd()
+```
+
+```{r}
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(lubridate)
+library(viridis)
+library(ggmap)
+library(broom)
+library(igraph)
+library(corrr)
+
+theme_set(theme_bw(base_size = 18))
+
+options(scipen = 999, digits = 4)
+```
+sudo apt-get install libudunits2-dev
+95j0us&A5VYf6I%IEi8K
+
+```{r}
+source("scripts/02_factorize_columns.R")
+source("scripts/03_clean_data.R")
+
+df <- data
+  #arrange(crash_year, crash_month, day_of_week, hour_of_day)
+
+#df %>% 
+#  select(crash_year, crash_month, day_of_week, hour_of_day) -> test
+rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
+```
+
+
+```{r}
+df %>% 
+  select(contains("death")) %>% 
+  gather(death_type, count) %>%
+  group_by(death_type) %>% 
+  summarize(count = sum(count)) %>% 
+  mutate(death_type = fct_reorder(death_type, count)) %>% 
+  arrange(death_type) %>% 
+  select(death_type) %>% 
+  unlist() -> death_type_fct
+  
+
+df %>% 
+  select(contains("death"), crash_year) %>% 
+  gather(death_type, count, -crash_year) %>% 
+  mutate(death_type = factor(death_type, levels = death_type_fct)) %>% 
+  group_by(crash_year, death_type) %>% 
+  summarize(count = sum(count)) %>% 
+  ggplot(aes(crash_year, count, fill = death_type, group = death_type)) +
+  geom_col() +
+  scale_fill_viridis(discrete = TRUE)
+```
+
+```{r}
+df %>% 
+  select(crash_year, contains("inj")) %>% 
+  select(crash_year, contains("count"), -c(injury_count, tot_inj_count)) %>% 
+  gather(inj_type, count, -crash_year) %>% 
+  group_by(inj_type) %>% 
+  summarize(count = sum(count)) %>% 
+  mutate(inj_type = fct_reorder(inj_type, count)) %>% 
+  arrange(inj_type) %>% 
+  select(inj_type) %>% 
+  unlist() -> inj_type_fct
+
+
+
+df %>% 
+  select(crash_year, contains("inj")) %>% 
+  select(crash_year, contains("count"), -c(injury_count, tot_inj_count)) %>% 
+  gather(inj_type, count, -crash_year) %>% 
+  mutate(inj_type = factor(inj_type, levels = inj_type_fct)) %>% 
+  group_by(crash_year, inj_type) %>% 
+  summarize(count = sum(count)) %>% 
+  ggplot(aes(crash_year, count, fill = inj_type, group = inj_type)) +
+  geom_col() +
+  scale_fill_viridis(discrete = TRUE)
+
+```
+
+```{r}
+df %>%
+  complete(road_condition, weather) %>% 
+  group_by(road_condition, weather) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>% 
+
+  ggplot(aes(road_condition, weather, fill = fatalities_per_person, alpha = person_sum)) +
+  geom_tile() +
+  coord_equal() +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_x_discrete(expand = c(0,0)) +
+  scale_fill_viridis() +
+  theme(panel.grid = element_blank())
+```
+
+```{r}
+df %>% 
+  select(illumination, weather, road_condition, road_owner, collision_type, relation_to_road, intersect_type, tcd_type, tcd_func_cd, location_type, rdwy_surf_type_cd, rdwy_orient, work_zone_type, work_zone_loc, person_count, fatal_count) %>% 
+  gather(metadata_measure, metadata_value, -c(person_count, fatal_count)) %>% 
+  group_by(metadata_measure, metadata_value) %>% 
+  summarize(person_sum = sum(person_count, na.rm = TRUE),
+            fatal_sum = sum(fatal_count, na.rm = TRUE),
+            fatalities_per_person = fatal_sum / person_sum) %>%
+  ggplot(aes(person_sum, fatal_sum, label = metadata_value)) +
+  geom_label() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~metadata_measure)
+```
+
+
+
+```{r}
+df %>% 
+  count(speed_limit) %>% 
+  ggplot(aes(speed_limit, n)) +
+  geom_col()
+```
+
+```{r}
+df %>%
+  count(speed_limit, speeding_related) %>% 
+  ggplot(aes(speed_limit, n, color = speeding_related)) +
+  geom_point()
+```
+
+#proportional bar chart of injuries + deaths for belted vs. unbelted
+
+
+#proportion of crashes with different driver ages
+```{r}
+
+
+
+```
+
+#gather() all other logical metadata columns such as turnpike, wet_road_snow_slush_road, make cumulative charts
+```{r}
+
+
+
+```
+
