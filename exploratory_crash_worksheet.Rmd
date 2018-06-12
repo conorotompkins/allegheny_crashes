@@ -27,8 +27,7 @@ theme_set(theme_bw(base_size = 18))
 
 options(scipen = 999, digits = 4)
 ```
-sudo apt-get install libudunits2-dev
-95j0us&A5VYf6I%IEi8K
+
 
 ```{r}
 source("scripts/02_factorize_columns.R")
@@ -69,7 +68,8 @@ df %>%
   geom_point() +
   geom_smooth() +
   labs(x = "Year-Month") +
-  theme(axis.text.x = element_blank())
+  theme(axis.text.x = element_blank(),
+        panel.grid = element_blank())
 ```
 
 
@@ -82,7 +82,8 @@ df %>%
     geom_jitter(alpha = .1) +
     geom_smooth() +
   labs(x = "Year-Month-Weekday") +
-  theme(axis.text.x = element_blank())
+theme(axis.text.x = element_blank(),
+        panel.grid = element_blank())
 ```
 
 ```{r}
@@ -94,7 +95,8 @@ df %>%
     geom_jitter(alpha = .01) +
     geom_smooth() +
   labs(x = "Year-Month-Weekday-Hour") +
-  theme(axis.text.x = element_blank())
+  theme(axis.text.x = element_blank(),
+        panel.grid = element_blank())
 ```
 
 ```{r}
@@ -126,18 +128,26 @@ df %>%
 ```
 
 ```{r}
-#not working
 df %>% 
-  mutate(day_of_week = fct_rev(day_of_week)) %>% 
+  select(day_of_week, time_of_day) %>% 
   filter(!time_of_day > 2400,
          !is.na(day_of_week)) %>% 
   count(day_of_week, time_of_day) %>% 
-  ggplot(aes(time_of_day, day_of_week, fill = n)) +
-  geom_point() +
-  coord_equal() +
+  complete(day_of_week, time_of_day = 0:2400) %>% 
+  replace_na(list(n = 0)) %>% 
+  mutate(day_of_week = fct_rev(day_of_week),
+         hour = time_of_day %/% 100,
+         minute = time_of_day %% 100,
+         time = make_datetime(hour = hour, min = minute)) -> test
+
+test %>% 
+  ggplot(aes(time, day_of_week, fill = n)) +
+  geom_tile() +
   scale_y_discrete(expand = c(0,0)) +
-  scale_x_continuous(expand = c(0,0)) +
-  scale_fill_viridis()
+  scale_x_datetime(date_labels = ("%H:%M"),
+                   expand = c(0,0)) +
+  scale_fill_viridis() 
+  
 ```
 
 ```{r}
