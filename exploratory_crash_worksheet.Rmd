@@ -3,6 +3,7 @@ title: "exploratory_crash_worksheet"
 author: "Conor Tompkins"
 date: "4/21/2018"
 output: html_document
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
@@ -22,6 +23,7 @@ library(ggmap)
 library(broom)
 library(igraph)
 library(corrr)
+library(gganimate)
 
 theme_set(theme_bw(base_size = 18))
 
@@ -113,7 +115,6 @@ df %>%
 ```
 
 ```{r}
-#animate this by month
 df %>% 
   mutate(day_of_week = fct_rev(day_of_week)) %>% 
   filter(!hour_of_day > 24,
@@ -127,29 +128,90 @@ df %>%
   scale_fill_viridis()
 ```
 
-```{r}
-#animate by year, month, and time. cumulative = TRUE so the chart builds left to right
-
+```{r, fig.show='animate'}
 df %>% 
-  select(day_of_week, time_of_day) %>% 
-  filter(!time_of_day > 2400,
-         !is.na(day_of_week)) %>% 
-  count(day_of_week, time_of_day) %>% 
-  complete(day_of_week, time_of_day = 0:2400) %>% 
-  replace_na(list(n = 0)) %>% 
+  arrange(crash_month, day_of_week, hour_of_day) %>% 
   mutate(day_of_week = fct_rev(day_of_week),
+         crash_month = factor(crash_month, ordered = FALSE),
+         period = fct_inorder(str_c(day_of_week, hour_of_day, sep = "-"))) %>% 
+  filter(!hour_of_day > 24,
+         !is.na(day_of_week)) %>% 
+  count(crash_month, day_of_week, hour_of_day) %>% 
+  ggplot(aes(hour_of_day, day_of_week, fill = n, frame = crash_month)) +
+  geom_tile() +
+  coord_equal() +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_fill_viridis() -> plot1
+#plot1
+gganimate(plot1, interval = .5)
+```
+
+```{r}
+df %>% 
+  select(crash_month, day_of_week, time_of_day) %>% 
+  filter(!time_of_day > 2400,
+         !is.na(day_of_week),
+         !is.na(crash_month)) %>% 
+  mutate(crash_month = factor(crash_month, ordered = FALSE),
+         day_of_week = fct_rev(day_of_week),
          hour = time_of_day %/% 100,
-         minute = time_of_day %% 100,
-         time = make_datetime(hour = hour, min = minute)) -> test
+         minute = time_of_day %% 100) %>% 
+  count(crash_month, day_of_week, hour, minute) %>% 
+  complete(crash_month, day_of_week, hour = 0:23, minute = 0:60) %>% 
+  replace_na(list(n = 0)) %>% 
+  mutate(time = make_datetime(hour = hour, min = minute),
+         time = round_date(time, unit = "15 minutes")) %>%
+  group_by(crash_month, day_of_week, time) %>% 
+  summarize(n = sum(n)) -> test
 
 test %>% 
-  ggplot(aes(time, day_of_week, fill = n)) +
+  ggplot(aes(time, day_of_week, fill = n, frame = crash_month)) +
   geom_tile() +
   scale_y_discrete(expand = c(0,0)) +
   scale_x_datetime(date_labels = ("%H:%M"),
                    expand = c(0,0)) +
-  scale_fill_viridis() 
-  
+  scale_fill_viridis("Number of crashes") +
+  labs(subtitle = "Car accidents in Allegheny County",
+       x = "Time (rounded to nearest 15 minutes)",
+       y = "",
+       caption = "@conor_tompkins, data from WPRDC")
+```
+
+```{r, fig.show='animate'}
+#animate by year, month, and time. cumulative = TRUE so the chart builds left to right
+#library(gganimate)
+df %>% 
+  select(crash_month, day_of_week, time_of_day) %>% 
+  filter(!time_of_day > 2400,
+         !is.na(day_of_week),
+         !is.na(crash_month)) %>% 
+  mutate(crash_month = factor(crash_month, ordered = FALSE),
+         day_of_week = fct_rev(day_of_week),
+         hour = time_of_day %/% 100,
+         minute = time_of_day %% 100) %>% 
+  count(crash_month, day_of_week, hour, minute) %>% 
+  complete(crash_month, day_of_week, hour = 0:23, minute = 0:60) %>% 
+  replace_na(list(n = 0)) %>% 
+  mutate(time = make_datetime(hour = hour, min = minute),
+         time = round_date(time, unit = "15 minutes")) %>%
+  group_by(crash_month, day_of_week, time) %>% 
+  summarize(n = sum(n)) -> test
+
+test %>% 
+  ggplot(aes(time, day_of_week, fill = n, frame = crash_month)) +
+  geom_tile() +
+  scale_y_discrete(expand = c(0,0)) +
+  scale_x_datetime(date_labels = ("%H:%M"),
+                   expand = c(0,0)) +
+  scale_fill_viridis("Number of crashes") +
+  labs(subtitle = "Car accidents in Allegheny County",
+       x = "Time (rounded to nearest 15 minutes)",
+       y = "",
+       caption = "@conor_tompkins, data from WPRDC") -> plot2
+
+#plot2
+gganimate(plot2, title_frame = TRUE,  interval = .75, ani.width=1600, ani.height=800, ani.res = 1000)
 ```
 
 ```{r}
