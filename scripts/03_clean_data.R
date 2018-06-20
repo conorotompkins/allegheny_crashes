@@ -3,7 +3,7 @@
 
 #df_combined_allegheny_county_crash_data_2004_2017_factorized <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_factorized.csv", col_types = cols(.default = "c"), progress = FALSE)
 
-glimpse(df_combined_allegheny_county_crash_data_2004_2017_factorized)
+#glimpse(df_combined_allegheny_county_crash_data_2004_2017_factorized)
 
 
 df_combined_allegheny_county_crash_data_2004_2017_factorized %>% 
@@ -56,7 +56,7 @@ df_combined_allegheny_county_crash_data_2004_2017_factorized %>%
   mutate_if(is.character, as.factor) %>% 
   mutate_at(vars(interstate:trolley), as.logical) -> data
 
-glimpse(data)
+#glimpse(data)
 
 
 
