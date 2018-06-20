@@ -24,6 +24,7 @@ library(broom)
 library(igraph)
 library(corrr)
 library(gganimate)
+library(scales)
 
 theme_set(theme_bw(base_size = 18))
 
@@ -44,12 +45,23 @@ rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 ```
 
 ```{r}
+my_subtitle <- "Allegheny County crash data 2004-2017"
+my_caption <- "@conor_tompkins - Data from WPRDC"
+```
+
+```{r}
 df %>% 
   mutate(crash_year = factor(crash_year)) %>% 
   count(crash_year) %>% 
   ggplot(aes(crash_year, n, group = 1)) +
   geom_line() +
-    scale_y_continuous(limits = c(0, 13000)) +
+  scale_y_continuous(limits = c(0, 13000),
+                     label=comma) +
+  labs(title = "Crashes per year",
+       subtitle = my_subtitle,
+       x = "",
+       y = "Number of crashes",
+       caption = my_caption) +
     theme(axis.text.x = element_text(angle = 75, hjust = 1))
 ```
 
@@ -58,7 +70,15 @@ df %>%
   mutate(crash_year = factor(crash_year)) %>% 
   count(crash_year, crash_month) %>%
   ggplot(aes(crash_month, n, color = crash_year, group = crash_year)) +
-    geom_line()
+    geom_line(size = 1.5) +
+    scale_y_continuous(label = comma) +
+    scale_color_viridis("Crash year",
+                        discrete = TRUE) +
+    labs(title = "Crashes per month",
+         subtitle = my_subtitle,
+         x = "",
+         y = "Number of crashes",
+         caption = my_caption)
 ```
 
 ```{r}
@@ -69,7 +89,12 @@ df %>%
   ggplot(aes(time_period, n, group = 1)) +
   geom_point() +
   geom_smooth() +
-  labs(x = "Year-Month") +
+  scale_y_continuous(label = comma) +
+  labs(title = "Timeline of crashes",
+       subtitle = my_subtitle,
+       x = "Year-Month",
+       y = "Number of crashes",
+       caption = my_caption) +
   theme(axis.text.x = element_blank(),
         panel.grid = element_blank())
 ```
@@ -83,8 +108,13 @@ df %>%
   ggplot(aes(time_period, n, group = 1)) +
     geom_jitter(alpha = .1) +
     geom_smooth() +
-  labs(x = "Year-Month-Weekday") +
-theme(axis.text.x = element_blank(),
+    scale_y_continuous(label = comma) +
+    labs(title = "Timeline of crashes",
+       subtitle = my_subtitle,
+       x = "Year-Month-Weekday",
+       y = "Number of crashes",
+       caption = my_caption) +
+  theme(axis.text.x = element_blank(),
         panel.grid = element_blank())
 ```
 
@@ -96,9 +126,14 @@ df %>%
   ggplot(aes(time_period, n, group = 1)) +
     geom_jitter(alpha = .01) +
     geom_smooth() +
-  labs(x = "Year-Month-Weekday-Hour") +
-  theme(axis.text.x = element_blank(),
-        panel.grid = element_blank())
+    scale_y_continuous(label = comma) +
+    labs(title = "Timeline of crashes",
+       subtitle = my_subtitle,
+       x = "Year-Month-Weekday-Hour",
+       y = "Number of crashes",
+       caption = my_caption) +
+    theme(axis.text.x = element_blank(),
+          panel.grid = element_blank())
 ```
 
 ```{r}
@@ -108,10 +143,18 @@ df %>%
   ggplot(aes(crash_year, crash_month, fill = n)) +
     geom_tile() +
     coord_equal() +
-    scale_x_continuous(expand = c(0,0)) +
+    scale_x_continuous(expand = c(0,0),
+                       breaks = c(2004:2017)) +
     scale_y_discrete(expand = c(0,0)) +
-    scale_fill_viridis() +
-    theme(panel.grid = element_blank())
+    scale_fill_viridis("Number of crashes",
+                       labels = comma) +
+    labs(title = "Crash heatmap",
+         subtitle = my_subtitle,
+         x = "Year",
+         y = "Month",
+         caption = my_caption) +
+    theme(panel.grid = element_blank(),
+          axis.text.x = element_text(angle = 75, hjust = 1))
 ```
 
 ```{r}
@@ -123,12 +166,18 @@ df %>%
   ggplot(aes(hour_of_day, day_of_week, fill = n)) +
   geom_tile() +
   coord_equal() +
+  labs(title = "Crash heatmap",
+       subtitle = my_subtitle,
+       x = "Hour of day",
+       y = "",
+       caption = my_caption) +
   scale_y_discrete(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0)) +
-  scale_fill_viridis()
+  scale_fill_viridis(labels = comma,
+                     "Number of crashes")
 ```
 
-```{r, fig.show='animate'}
+```{r, fig.show='animate', eval=FALSE}
 df %>% 
   arrange(crash_month, day_of_week, hour_of_day) %>% 
   mutate(day_of_week = fct_rev(day_of_week),
@@ -149,36 +198,35 @@ gganimate(plot1, interval = .5)
 
 ```{r}
 df %>% 
-  select(crash_month, day_of_week, time_of_day) %>% 
+  select(day_of_week, time_of_day) %>% 
   filter(!time_of_day > 2400,
-         !is.na(day_of_week),
-         !is.na(crash_month)) %>% 
-  mutate(crash_month = factor(crash_month, ordered = FALSE),
-         day_of_week = fct_rev(day_of_week),
+         !is.na(day_of_week)) %>% 
+  mutate(day_of_week = fct_rev(day_of_week),
          hour = time_of_day %/% 100,
          minute = time_of_day %% 100) %>% 
-  count(crash_month, day_of_week, hour, minute) %>% 
-  complete(crash_month, day_of_week, hour = 0:23, minute = 0:60) %>% 
+  count(day_of_week, hour, minute) %>% 
+  complete(day_of_week, hour = 0:23, minute = 0:60) %>% 
   replace_na(list(n = 0)) %>% 
   mutate(time = make_datetime(hour = hour, min = minute),
          time = round_date(time, unit = "15 minutes")) %>%
-  group_by(crash_month, day_of_week, time) %>% 
+  group_by(day_of_week, time) %>% 
   summarize(n = sum(n)) -> test
 
 test %>% 
-  ggplot(aes(time, day_of_week, fill = n, frame = crash_month)) +
+  ggplot(aes(time, day_of_week, fill = n)) +
   geom_tile() +
   scale_y_discrete(expand = c(0,0)) +
   scale_x_datetime(date_labels = ("%H:%M"),
                    expand = c(0,0)) +
   scale_fill_viridis("Number of crashes") +
-  labs(subtitle = "Car accidents in Allegheny County",
+  labs(title = "Crash heatmap",
+       subtitle = my_subtitle,
        x = "Time (rounded to nearest 15 minutes)",
        y = "",
-       caption = "@conor_tompkins, data from WPRDC")
+       caption = my_caption)
 ```
 
-```{r, fig.show='animate'}
+```{r, fig.show='animate', eval=FALSE}
 #animate by year, month, and time. cumulative = TRUE so the chart builds left to right
 #library(gganimate)
 df %>% 
