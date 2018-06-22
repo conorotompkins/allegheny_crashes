@@ -263,12 +263,23 @@ gganimate(plot2, title_frame = TRUE,  interval = .75, ani.width=1600, ani.height
 ```
 
 ```{r}
-df %>% 
+df %>%
+  select(time_of_day, day_of_week) %>% 
   filter(!time_of_day > 2400,
          !is.na(day_of_week)) %>% 
-  ggplot(aes(time_of_day, color = day_of_week)) +
+  mutate(hour = time_of_day %/% 100,
+         minute = time_of_day %% 100,
+         time = make_datetime(hour = hour, min = minute),
+         time = round_date(time, unit = "15 minutes")) %>% 
+  ggplot(aes(time, color = day_of_week)) +
   geom_freqpoly(size = 2) +
-  scale_color_viridis(discrete = TRUE)
+  scale_color_viridis("Weekday", 
+                      discrete = TRUE) +
+  labs(title = "",
+       subtitle = my_subtitle,
+       x = "Time (rounded to nearest 15 minutes)",
+       y = "Number of crashes",
+       caption = my_caption)
 ```
 
 ```{r}
@@ -284,7 +295,12 @@ df %>%
   coord_equal() +
   scale_y_discrete(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0)) +
-  scale_fill_viridis()
+  scale_fill_viridis("Fatalities per person") +
+  labs(title = "",
+       subtitle = my_subtitle,
+       x = "Hour",
+       y = "",
+       caption = my_caption)
 ```
 
 ```{r}
@@ -298,7 +314,13 @@ df %>%
   mutate(n_cumulative = cumsum(n)) %>% 
   ggplot(aes(crash_month, n_cumulative, color = crash_year, group = crash_year)) +
   geom_line(size = 2) +
-  scale_color_viridis(discrete = TRUE) +
+  scale_color_viridis("", discrete = TRUE) +
+  scale_y_continuous(label = comma) +
+  labs(title = "",
+       subtitle = my_subtitle,
+       x = "",
+       y = "Cumulative sum of crashes",
+       caption = my_caption) +
   theme(panel.grid = element_blank())
 ```
 
@@ -314,7 +336,14 @@ df %>%
   mutate(person_count_cumulative = cumsum(person_count)) %>% 
   ggplot(aes(crash_month, person_count_cumulative, color = crash_year, group = crash_year)) +
   geom_line(size = 2) +
-  scale_color_viridis(discrete = TRUE) +
+  scale_color_viridis("",
+                      discrete = TRUE) +
+  scale_y_continuous(label = comma) +
+  labs(title = "",
+       subtitle = my_subtitle,
+       x = "",
+       y = "Cumulative sum of people involved",
+       caption = my_caption) +
   theme(panel.grid = element_blank())
 ```
 
@@ -327,10 +356,17 @@ df %>%
          time_period = fct_inorder(time_period)) %>%
   group_by(crash_year, crash_month) %>% 
   summarize(fatal_count = sum(fatal_count)) %>% 
-  mutate(person_count_cumulative = cumsum(fatal_count)) %>% 
-  ggplot(aes(crash_month, person_count_cumulative, color = crash_year, group = crash_year)) +
+  mutate(fatal_count_cumulative = cumsum(fatal_count)) %>% 
+  ggplot(aes(crash_month, fatal_count_cumulative, color = crash_year, group = crash_year)) +
   geom_line(size = 2) +
-  scale_color_viridis(discrete = TRUE) +
+  scale_color_viridis("",
+                      discrete = TRUE) +
+  scale_y_continuous(label = comma) +
+  labs(title = "",
+       subtitle = my_subtitle,
+       x = "",
+       y = "Cumulative sum of fatalites",
+       caption = my_caption) +
   theme(panel.grid = element_blank())
 ```
 
@@ -352,10 +388,19 @@ df %>%
   mutate(n_cumulative = cumsum(n)) -> df_cumulative
 
 df_cumulative %>% 
-  ggplot(aes(time_period, n_cumulative, group = 1)) +
+  ggplot(aes(time_period, n_cumulative, color = measure, group = measure)) +
   geom_line(size = 1) +
   facet_wrap(~measure,
+             ncol = 2,
              scales = "free_y") +
+  scale_color_viridis(discrete = TRUE,
+                      guide = FALSE) +
+  scale_y_continuous(label = comma) +
+  labs(title = "",
+       subtitle = my_subtitle,
+       x = "Year-Month",
+       y = "Cumulative sum",
+       caption = my_caption) +
   theme(panel.grid = element_blank(),
         axis.text.x = element_blank())
 ```
