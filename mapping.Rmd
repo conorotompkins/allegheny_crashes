@@ -150,9 +150,12 @@ map_pgh +
   facet_wrap(~day_type, nrow = 1) +
   scale_fill_viridis("Number of crashes") +
   labs(title = "Hour:",
-       subtitle = "Crashes in Allegheny County 2014-2017") +
-  theme_void() -> p
-gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000)
+       subtitle = "Crashes in Allegheny County 2004-2017",
+       caption = "@conor_tompkins, data from WPRDC") +
+  theme_void() +
+  theme(legend.position="bottom",
+        legend.direction = "horizontal") -> p
+gganimate(p, interval = .5, title_frame = TRUE, ani.width=600, ani.height= 400, ani.res = 500)
 
-gganimate(p, interval = .5, title_frame = TRUE, ani.width=1600, ani.height=800, ani.res = 1000, "output.gif")
+gganimate(p, interval = .5, title_frame = TRUE, ani.width=600, ani.height= 400, ani.res = 500, "output.gif")
 ```
