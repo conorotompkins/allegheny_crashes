@@ -22,6 +22,7 @@ library(ggmap)
 library(broom)
 library(igraph)
 library(corrr)
+library(scales)
 
 theme_set(theme_bw(base_size = 18))
 
@@ -62,7 +63,9 @@ df %>%
   group_by(crash_year, death_type) %>% 
   summarize(count = sum(count)) %>% 
   ggplot(aes(crash_year, count, fill = death_type, group = death_type)) +
-  geom_col() +
+  geom_area() +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
   scale_fill_viridis(discrete = TRUE)
 ```
 
@@ -117,11 +120,19 @@ df %>%
   group_by(metadata_measure, metadata_value) %>% 
   summarize(person_sum = sum(person_count, na.rm = TRUE),
             fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>%
+            fatalities_per_person = fatal_sum / person_sum) -> df_crash_metadata
+
+df_crash_metadata %>% 
   ggplot(aes(person_sum, fatal_sum, label = metadata_value)) +
   geom_label() +
   geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~metadata_measure)
+```
+
+```{r}
+df_crash_metadata %>%
+  ggplot(aes(person_sum, fatal_sum, label = metadata_value, color = metadata_measure)) +
+  geom_smooth(method = "lm", se = FALSE)
 ```
 
 
@@ -145,8 +156,23 @@ df %>%
 
 #proportion of crashes with different driver ages
 ```{r}
+colnames(df)
 
+df %>% 
+  select(crash_year, contains("driver_count")) %>% 
+  gather(driver_age_count, count, -crash_year) %>% 
+  group_by(crash_year, driver_age_count) %>% 
+  summarize(count = sum(count)) %>% 
+  group_by(crash_year) %>% 
+  mutate(percent = count / sum(count)) -> df_driver_age
 
+df_driver_age %>% 
+  ggplot(aes(crash_year, percent, fill = driver_age_count)) +
+  geom_area() +
+  scale_fill_viridis(discrete = TRUE) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0),
+                     labels = percent)
 
 ```
 
