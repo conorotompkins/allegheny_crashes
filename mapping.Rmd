@@ -159,3 +159,23 @@ gganimate(p, interval = .5, title_frame = TRUE, ani.width=600, ani.height= 400, 
 
 gganimate(p, interval = .5, title_frame = TRUE, ani.width=600, ani.height= 400, ani.res = 500, "output.gif")
 ```
+
+```{r}
+map_pgh_ped <- get_map("Downtown Pittsburgh, PA",
+                   zoom = 15,
+                   maptype = "toner",
+                   source = "stamen")
+
+map_pgh_ped <- ggmap(map_pgh_ped)
+map_pgh_ped
+
+df %>% 
+  select(dec_lat, dec_long, pedestrian, ped_count) %>% 
+  filter(pedestrian == TRUE) -> df_ped
+
+map_pgh +
+  geom_point(data = df_ped, aes(dec_long, dec_lat, size = ped_count),
+             alpha = .1)
+
+
+```
