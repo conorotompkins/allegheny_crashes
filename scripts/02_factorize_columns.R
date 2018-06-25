@@ -1,7 +1,7 @@
 library(tidyverse)
 library(lubridate)
 
-df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv", col_types = cols(.default = "c"), progress = FALSE)
+df_combined_allegheny_county_crash_data_2004_2017_raw <- read_csv("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/data/df_combined_allegheny_county_crash_data_2004_2017_raw.csv", col_types = cols(.default = "c"), progress = FALSE)
 
 df_dictionary <- read_csv("data/df_dictionary_rebuilt.csv") %>% 
   filter(!is.na(code))
