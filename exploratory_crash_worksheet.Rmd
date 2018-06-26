@@ -11,7 +11,8 @@ runtime: shiny
 #Setup
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,
-                      message = FALSE)
+                      message = FALSE,
+                      warning = FALSE)
 
 getwd()
 ```
@@ -56,11 +57,12 @@ df %>%
   count(crash_year) %>% 
   ggplot(aes(crash_year, n, group = 1)) +
   geom_line() +
+  geom_point() +
   scale_y_continuous(limits = c(0, 13000),
                      label=comma) +
   labs(title = "Crashes per year",
        subtitle = my_subtitle,
-       x = "",
+       x = NULL,
        y = "Number of crashes",
        caption = my_caption) +
     theme(axis.text.x = element_text(angle = 75, hjust = 1))
@@ -83,9 +85,10 @@ df %>%
                         discrete = TRUE) +
     labs(title = "Crashes per month",
          subtitle = my_subtitle,
-         x = "Jitter applied",
+         x = "1 dot = Month/Year. Jitter applied",
          y = "Number of crashes",
-         caption = my_caption)
+         caption = my_caption) +
+  theme(axis.title.x = element_text(size = 12))
 ```
 
 ```{r}
@@ -112,9 +115,11 @@ df_months_year_dow %>%
   scale_y_continuous(label = comma) +
   labs(title = "Crashes per weekday",
          subtitle = my_subtitle,
-         x = "Large dot = median",
+         x = "Large dot = median, small dot = Weekday/Month/Year",
          y = "Number of crashes",
-         caption = my_caption)
+         caption = my_caption) +
+  theme(axis.title.x = element_text(size = 12),
+        axis.text.x = element_text(size = 12))
 ```
 
 
@@ -132,8 +137,8 @@ df %>%
                        labels = comma) +
     labs(title = "Crash heatmap",
          subtitle = my_subtitle,
-         x = "Year",
-         y = "Month",
+         x = NULL,
+         y = NULL,
          caption = my_caption) +
     theme(panel.grid = element_blank(),
           axis.text.x = element_text(angle = 75, hjust = 1))
@@ -156,7 +161,10 @@ df %>%
   scale_y_discrete(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0)) +
   scale_fill_viridis(labels = comma,
-                     "Number of crashes")
+                     "Number of crashes") +
+  theme(legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.text = element_text(size = 8))
 ```
 
 ```{r, fig.show='animate', eval= FALSE}
@@ -205,7 +213,10 @@ test %>%
        subtitle = my_subtitle,
        x = "Time (rounded to nearest 15 minutes)",
        y = "",
-       caption = my_caption)
+       caption = my_caption) +
+  theme(legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.text = element_text(size = 8, angle = 300))
 ```
 
 ```{r, fig.show='animate', eval= FALSE}
@@ -257,6 +268,7 @@ df %>%
   geom_freqpoly(size = 2) +
   scale_color_viridis("Weekday", 
                       discrete = TRUE) +
+  scale_x_datetime(labels = date_format("%H:%M")) +
   labs(title = "",
        subtitle = my_subtitle,
        x = "Time (rounded to nearest 15 minutes)",
@@ -282,7 +294,11 @@ df %>%
        subtitle = my_subtitle,
        x = "Hour",
        y = "",
-       caption = my_caption)
+       caption = my_caption) +
+  theme(legend.direction = "horizontal",
+        legend.position = "bottom",
+        legend.text = element_text(size = 8, 
+                                   angle = 300))
 ```
 
 
@@ -312,7 +328,7 @@ df_cumulative %>%
   ggplot(aes(time_period, n_cumulative, color = measure, group = measure)) +
   geom_line(size = 1) +
   facet_wrap(~measure,
-             ncol = 2,
+             ncol = 3,
              scales = "free_y") +
   scale_color_viridis(discrete = TRUE,
                       guide = FALSE) +
@@ -388,12 +404,9 @@ df %>%
   ungroup() %>% 
   mutate(death_type = factor(death_type,
                              levels = c("belted_death_count", "unb_death_count"),
-                             labels = c("Belted deaths", "Unbelted deaths"))) -> test 
-  
-  
-  
-  
-test %>% 
+                             labels = c("Belted deaths", "Unbelted deaths"))) -> df_belted_unbelted
+
+df_belted_unbelted %>% 
   ggplot(aes(time_period, death_count_cum, color = death_type, group = death_type)) +
   geom_line(size = 2) +
   scale_color_viridis("", discrete = TRUE) +
