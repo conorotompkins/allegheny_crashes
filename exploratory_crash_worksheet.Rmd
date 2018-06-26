@@ -42,7 +42,8 @@ my_caption <- "@conor_tompkins - Data from WPRDC"
 source("scripts/02_factorize_columns.R")
 source("scripts/03_clean_data.R")
 
-df <- data
+df <- data %>% 
+  mutate(casualty_count = injury_count + fatal_count)
   #arrange(crash_year, crash_month, day_of_week, hour_of_day)
 
 #df %>% 
@@ -103,7 +104,7 @@ df_months_year_dow %>%
 df_months_year_dow %>% 
   ggplot(aes(day_of_week, n, color = day_of_week)) +
   geom_jitter(height = 0,
-              alpha = .1,
+              alpha = .2,
               show.legend = F) +
   geom_point(data = df_dow,
              aes(x = day_of_week,
@@ -164,7 +165,8 @@ df %>%
                      "Number of crashes") +
   theme(legend.position = "bottom",
         legend.direction = "horizontal",
-        legend.text = element_text(size = 8))
+        legend.text = element_text(size = 8, 
+                                   angle = 300))
 ```
 
 ```{r, fig.show='animate', eval= FALSE}
@@ -200,9 +202,9 @@ df %>%
   mutate(time = make_datetime(hour = hour, min = minute),
          time = round_date(time, unit = "15 minutes")) %>%
   group_by(day_of_week, time) %>% 
-  summarize(n = sum(n)) -> test
+  summarize(n = sum(n)) -> df_time_rounded
 
-test %>% 
+df_time_rounded %>% 
   ggplot(aes(time, day_of_week, fill = n)) +
   geom_tile() +
   scale_y_discrete(expand = c(0,0)) +
@@ -282,14 +284,14 @@ df %>%
   filter(hour_of_day < 24) %>% 
   group_by(day_of_week, hour_of_day) %>% 
   summarize(person_sum = sum(person_count, na.rm = TRUE),
-            fatal_sum = sum(fatal_count, na.rm = TRUE),
-            fatalities_per_person = fatal_sum / person_sum) %>% 
-  ggplot(aes(hour_of_day, day_of_week, fill = fatalities_per_person)) +
+            casualties_sum = sum(casualty_count, na.rm = TRUE),
+            casualties_per_person = casualties_sum / person_sum) %>% 
+  ggplot(aes(hour_of_day, day_of_week, fill = casualties_per_person)) +
   geom_tile() +
   coord_equal() +
   scale_y_discrete(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0)) +
-  scale_fill_viridis("Fatalities per person") +
+  scale_fill_viridis("Casualties per person") +
   labs(title = "",
        subtitle = my_subtitle,
        x = "Hour",
@@ -302,7 +304,9 @@ df %>%
 ```
 
 
-```{r}
+```{r eval = FALSE}
+#split this into 2 charts
+
 df %>% 
   select(crash_year, crash_month, person_count, fatal_count, injury_count, unb_death_count, belted_death_count, ped_death_count, bicycle_death_count) %>% 
   arrange(crash_year, crash_month) %>%
@@ -343,49 +347,44 @@ df_cumulative %>%
 
 ```{r}
 df %>% 
-  select(crash_year, crash_month, fatal_count) %>% 
-  arrange(crash_year, crash_month) %>%
-  mutate(crash_year = fct_inorder(as.character(crash_year)),
-         time_period = str_c(crash_year, crash_month, sep = "-"),
-         time_period = fct_inorder(time_period)) %>%
-  group_by(crash_year, crash_month) %>% 
-  summarize(fatal_count = sum(fatal_count)) %>% 
-  mutate(fatal_count_cumulative = cumsum(fatal_count)) %>% 
-  ggplot(aes(crash_month, fatal_count_cumulative, color = crash_year, group = crash_year)) +
-  geom_line(size = 2) +
-  scale_color_viridis("",
-                      discrete = TRUE) +
-  scale_y_continuous(label = comma) +
-  labs(title = "",
+  select(crash_year, crash_month, injury_count, fatal_count) %>% 
+  gather(measure, value, -c(crash_year, crash_month)) %>% 
+  mutate(measure = factor(measure, 
+                          levels = c("injury_count", "fatal_count"),
+                          labels = c("Injuries", "Fatalities"))) %>% 
+  group_by(crash_year, crash_month, measure) %>% 
+  summarize(value = sum(value, na.rm = TRUE)) %>% 
+  ggplot(aes(crash_month, value, color = crash_month)) +
+    geom_jitter(alpha = .75,
+                height = 0,
+                width = .25,
+                show.legend = FALSE) +
+    facet_wrap(~measure,
+             ncol = 1,
+             scales = "free") +
+    labs(title = "Injuries and fatalities",
        subtitle = my_subtitle,
-       x = "",
-       y = "Cumulative sum of fatalites",
-       caption = my_caption) +
-  theme(panel.grid = element_blank())
+       x = NULL,
+       y = "Sum")
 ```
 
 
 ```{r}
 df %>% 
-  select(crash_year, crash_month, ped_death_count) %>% 
-  arrange(crash_year, crash_month) %>%
-  mutate(crash_year = fct_inorder(as.character(crash_year)),
-        time_period = str_c(crash_year, crash_month, sep = "-"),
-         time_period = fct_inorder(time_period)) %>%
+  select(crash_year, crash_month, ped_death_count) %>%
   group_by(crash_year, crash_month) %>% 
-  summarize(pedestrian_deaths = sum(ped_death_count)) %>% 
-  group_by(crash_year) %>% 
-  mutate(pedestrian_deaths_cum = cumsum(pedestrian_deaths)) %>% 
-  ggplot(aes(crash_month, pedestrian_deaths_cum, color = crash_year, group = crash_year)) +
-  geom_line(size = 2) +
-  scale_color_viridis("", discrete = TRUE) +
-  scale_y_continuous(label = comma) +
-  labs(title = "",
+  summarize(ped_death_count = sum(ped_death_count, na.rm = TRUE)) %>% 
+  ggplot(aes(crash_month, ped_death_count, color = crash_month)) +
+    geom_jitter(alpha = .75,
+                height = .15,
+                width = .25,
+                show.legend = FALSE) +
+    scale_color_viridis("Month",
+                      discrete = TRUE) +
+    labs(title = "Pedestrian deaths",
        subtitle = my_subtitle,
-       x = "",
-       y = "Cumulative sum of pedestrian deaths",
-       caption = my_caption) +
-  theme(panel.grid = element_blank())
+       x = NULL,
+       y = "Sum")
 ```
 
 ```{r}
