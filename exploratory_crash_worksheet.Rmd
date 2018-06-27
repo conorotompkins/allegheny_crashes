@@ -7,11 +7,11 @@ runtime: shiny
 ---
 
 #Introduction
+WPRDC has published a [dataset](https://data.wprdc.org/dataset/allegheny-county-crash-data) on car crashes in Allegheny County from 2004-2017. I was interested to see if there were any patterns or interesting trends in the data.
 
 #Setup
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,
-                      message = FALSE,
+knitr::opts_chunk$set(message = FALSE,
                       warning = FALSE)
 
 getwd()
@@ -23,8 +23,6 @@ library(skimr)
 library(janitor)
 library(lubridate)
 library(viridis)
-library(igraph)
-library(gganimate)
 library(scales)
 
 theme_set(theme_bw(base_size = 18))
@@ -38,17 +36,15 @@ my_caption <- "@conor_tompkins - Data from WPRDC"
 ```
 
 ##Load data
+The data was difficult to work with, so I condensed my data munging and cleansing workflow into the following scripts. I may write a post about that process in the future.
 ```{r}
-source("scripts/02_factorize_columns.R")
-source("scripts/03_clean_data.R")
+source("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/scripts/02_factorize_columns.R")
+source("https://raw.githubusercontent.com/conorotompkins/allegheny_crashes/master/scripts/03_clean_data.R")
 
 df <- data %>% 
   mutate(casualty_count = injury_count + fatal_count)
-  #arrange(crash_year, crash_month, day_of_week, hour_of_day)
 
-#df %>% 
-#  select(crash_year, crash_month, day_of_week, hour_of_day) -> test
-rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
+rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized", "df_dictionary")
 ```
 
 This graph shows that the number of crashes per year is stable, with some year-to-year variation.
@@ -92,38 +88,42 @@ df %>%
   theme(axis.title.x = element_text(size = 12))
 ```
 
+This shows that there is much greater variation between weekdays, though there is still a perceptible pattern.
 ```{r}
 df %>% 
   count(crash_year, crash_month, day_of_week) -> df_months_year_dow
-
 
 df_months_year_dow %>% 
   group_by(day_of_week) %>% 
   summarize(median = median(n)) -> df_dow
 
 df_months_year_dow %>% 
-  ggplot(aes(day_of_week, n, color = day_of_week)) +
-  geom_jitter(height = 0,
-              alpha = .2,
+  ggplot(aes(day_of_week, n)) +
+  geom_jitter(aes(color = day_of_week), 
+              height = 0,
+              alpha = .3,
               show.legend = F) +
   geom_point(data = df_dow,
              aes(x = day_of_week,
-                 y = median),
+                 y = median,
+                 fill = day_of_week),
+             color = "black",
              size = 4,
+             shape = 21,
              show.legend = F) +
-  scale_color_viridis("Weekday",
-                        discrete = TRUE) +
+  scale_color_viridis(discrete = TRUE) +
+  scale_fill_viridis(discrete = TRUE) +
   scale_y_continuous(label = comma) +
   labs(title = "Crashes per weekday",
          subtitle = my_subtitle,
-         x = "Large dot = median, small dot = Weekday/Month/Year",
+         x = "Large dot = median, small dot = Weekday/Month/Year. Jitter applied",
          y = "Number of crashes",
          caption = my_caption) +
   theme(axis.title.x = element_text(size = 12),
         axis.text.x = element_text(size = 12))
 ```
 
-
+This shows that the number of crashes increases in the fall and winter.
 ```{r}
 df %>% 
   mutate(crash_month = fct_rev(crash_month)) %>% 
@@ -145,6 +145,7 @@ df %>%
           axis.text.x = element_text(angle = 75, hjust = 1))
 ```
 
+These plots show how the number of crashes changes throughout the day.
 ```{r}
 df %>% 
   mutate(day_of_week = fct_rev(day_of_week)) %>% 
@@ -169,7 +170,7 @@ df %>%
                                    angle = 300))
 ```
 
-```{r, fig.show='animate', eval= FALSE}
+```{r, fig.show='animate', eval= FALSE, echo = FALSE}
 df %>% 
   arrange(crash_month, day_of_week, hour_of_day) %>% 
   mutate(day_of_week = fct_rev(day_of_week),
@@ -188,6 +189,7 @@ df %>%
 gganimate(plot1, interval = .5)
 ```
 
+This shows a more granular view:
 ```{r}
 df %>% 
   select(day_of_week, time_of_day) %>% 
@@ -221,7 +223,7 @@ df_time_rounded %>%
         legend.text = element_text(size = 8, angle = 300))
 ```
 
-```{r, fig.show='animate', eval= FALSE}
+```{r, fig.show='animate', eval= FALSE, echo = FALSE}
 #animate by year, month, and time. cumulative = TRUE so the chart builds left to right
 #library(gganimate)
 df %>% 
@@ -257,6 +259,7 @@ test %>%
 gganimate(plot2, title_frame = TRUE,  interval = .75, ani.width=1600, ani.height=800, ani.res = 1000)
 ```
 
+This is a different veiew of the same data. Saturday and Sunday behave differently than the weekdays.
 ```{r}
 df %>%
   select(time_of_day, day_of_week) %>% 
@@ -271,13 +274,15 @@ df %>%
   scale_color_viridis("Weekday", 
                       discrete = TRUE) +
   scale_x_datetime(labels = date_format("%H:%M")) +
-  labs(title = "",
+  scale_y_continuous(labels = comma) +
+  labs(title = "Number of crashes",
        subtitle = my_subtitle,
        x = "Time (rounded to nearest 15 minutes)",
        y = "Number of crashes",
        caption = my_caption)
 ```
 
+This shows that there are more casualties (injuries and fatalities) per person involved in the crash in the early morning.
 ```{r}
 df %>%
   mutate(day_of_week = fct_rev(day_of_week)) %>% 
@@ -292,7 +297,7 @@ df %>%
   scale_y_discrete(expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0)) +
   scale_fill_viridis("Casualties per person") +
-  labs(title = "",
+  labs(title = "Casualties per person",
        subtitle = my_subtitle,
        x = "Hour",
        y = "",
@@ -304,7 +309,7 @@ df %>%
 ```
 
 
-```{r eval = FALSE}
+```{r eval = FALSE, echo = FALSE}
 #split this into 2 charts
 
 df %>% 
@@ -345,6 +350,7 @@ df_cumulative %>%
   theme(panel.grid = element_blank())
 ```
 
+The number of injuries and fatalities follow the same general pattern, but it is less pronunced in the fatality data.
 ```{r}
 df %>% 
   select(crash_year, crash_month, injury_count, fatal_count) %>% 
@@ -364,29 +370,29 @@ df %>%
              scales = "free") +
     labs(title = "Injuries and fatalities",
        subtitle = my_subtitle,
-       x = NULL,
+       x = "Jitter applied",
        y = "Sum")
 ```
 
-
+This shows the number of pedestrian fatalities by month.
 ```{r}
 df %>% 
   select(crash_year, crash_month, ped_death_count) %>%
   group_by(crash_year, crash_month) %>% 
   summarize(ped_death_count = sum(ped_death_count, na.rm = TRUE)) %>% 
   ggplot(aes(crash_month, ped_death_count, color = crash_month)) +
-    geom_jitter(alpha = .75,
-                height = .15,
+    geom_jitter(height = .15,
                 width = .25,
                 show.legend = FALSE) +
     scale_color_viridis("Month",
                       discrete = TRUE) +
-    labs(title = "Pedestrian deaths",
+    labs(title = "Pedestrian fatalities",
        subtitle = my_subtitle,
-       x = NULL,
+       x = "One dot = Month/Year. Jitter applied",
        y = "Sum")
 ```
 
+The rate of increase in the number of fatalities among belted vehicle occupants has been decreasing, while the rate among unbelted occupants has been increasing.
 ```{r}
 df %>% 
   select(crash_year, crash_month, belted_death_count, unb_death_count) %>% 
@@ -398,7 +404,6 @@ df %>%
   gather(death_type, death_count, -c(time_period, crash_year, crash_month)) %>% 
   arrange(death_type, time_period) %>% 
   group_by(death_type) %>% 
-  #group_by(time_period) %>% 
   mutate(death_count_cum = cumsum(death_count)) %>% 
   ungroup() %>% 
   mutate(death_type = factor(death_type,
