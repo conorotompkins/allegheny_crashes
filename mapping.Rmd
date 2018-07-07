@@ -155,14 +155,15 @@ map_pgh +
   theme_void() +
   theme(legend.position="bottom",
         legend.direction = "horizontal") -> p
+
 gganimate(p, interval = .5, title_frame = TRUE, ani.width=600, ani.height= 400, ani.res = 500)
 
 gganimate(p, interval = .5, title_frame = TRUE, ani.width=600, ani.height= 400, ani.res = 500, "output.gif")
 ```
 
 ```{r}
-map_pgh_ped <- get_map("Downtown Pittsburgh, PA",
-                   zoom = 15,
+map_pgh_ped <- get_map("The Hill, Pittsburgh, PA",
+                   zoom = 12,
                    maptype = "toner",
                    source = "stamen")
 
@@ -171,11 +172,43 @@ map_pgh_ped
 
 df %>% 
   select(dec_lat, dec_long, pedestrian, ped_count) %>% 
-  filter(pedestrian == TRUE) -> df_ped
+  filter(pedestrian == TRUE) %>% 
+  group_by(dec_lat, dec_long) %>% 
+  summarize(ped_count = sum(ped_count, na.rm = TRUE)) -> df_ped
 
-map_pgh +
+map_pgh_ped +
   geom_point(data = df_ped, aes(dec_long, dec_lat, size = ped_count),
-             alpha = .1)
+             alpha = .5,
+             color = "red")
 
+map_pgh_ped +
+  stat_density_2d(data = df_ped, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .3) +
+  scale_fill_viridis("Number of crashes involving pedestrians") +
+  theme_void()
+```
 
+```{r}
+df %>% 
+  select(dec_lat, dec_long, bicycle, bicycle_count) %>% 
+  filter(bicycle == TRUE) %>% 
+  group_by(dec_lat, dec_long) %>% 
+  summarize(bicycle_count = sum(bicycle_count, na.rm = TRUE)) -> df_bicycle
+
+map_pgh_ped +
+  geom_point(data = df_bicycle, aes(dec_long, dec_lat, size = bicycle_count),
+             alpha = .5,
+             color = "red")
+
+map_pgh_ped +
+  stat_density_2d(data = df_bicycle, 
+                  aes(dec_long, dec_lat,
+                      fill = ..level..),
+                  geom = "polygon",
+                  alpha = .3) +
+  scale_fill_viridis("Number of crashes involving bicyclists") +
+  theme_void()
 ```
