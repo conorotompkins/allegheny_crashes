@@ -16,6 +16,9 @@ source("scripts/03_clean_data.R")
 df <- data
 rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 
+#http://rstudio.github.io/leaflet/
+#https://rpubs.com/bhaskarvk/leaflet-heatmap
+#https://rpubs.com/bhaskarvk/leaflet-heat
 
 df %>% 
   mutate(casualties = fatal_count + injury_count) %>% 
