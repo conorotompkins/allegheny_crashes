@@ -21,12 +21,20 @@ rm("data", "df_combined_allegheny_county_crash_data_2004_2017_factorized")
 #https://rpubs.com/bhaskarvk/leaflet-heat
 
 df %>% 
+  count(crash_county)
+
+df %>% 
+  filter(crash_county == 1) %>% 
   mutate(casualties = fatal_count + injury_count) %>% 
   select(dec_lat, dec_long, casualties) %>% 
   rename(lat = dec_lat, 
          long = dec_long) %>% 
   na.omit() -> df_map
 
+
+df_map %>% 
+  mutate(id = row_number()) %>% 
+  filter(id <= 100000) -> df_map_small
 
 leaflet(df_map_small) %>% 
   setView(lng = -80.000926, lat = 40.441202, zoom = 12) %>% 
@@ -38,9 +46,7 @@ leaflet(df_map_small) %>%
 
 
 
-df_map %>% 
-  mutate(id = row_number()) %>% 
-  filter(id <= 100000) -> df_map_small
+
   
 leaflet(df_map) %>% 
   setView(lng = -80.000926, lat = 40.441202, zoom = 12) %>% 
@@ -53,5 +59,4 @@ leaflet(df_map) %>%
   setView(lng = -80.000926, lat = 40.441202, zoom = 12) %>% 
   addTiles() %>% 
   addHeatmap()
-
 
